@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <g fill="#fbbf24">
+    <!-- Left ear (back) - large oval shape -->
+    <ellipse cx="140" cy="100" rx="45" ry="95" transform="rotate(-30 140 100)"/>
+    
+    <!-- Right ear (front) - pointed shape -->
+    <path d="M260 60 Q290 40, 310 65 Q320 90, 315 120 Q310 150, 295 165 Q280 175, 270 170 Q265 140, 262 105 Q260 80, 260 60 Z"/>
+    
+    <!-- Head main shape -->
+    <ellipse cx="200" cy="200" rx="85" ry="105"/>
+    
+    <!-- Forehead/top of head curve -->
+    <path d="M160 140 Q180 120, 210 125 Q230 130, 240 145 L240 180 Q230 170, 210 165 Q190 160, 170 165 Z"/>
+    
+    <!-- Snout/muzzle extending right -->
+    <path d="M260 190 Q310 185, 345 205 Q365 220, 365 245 Q360 270, 340 280 Q310 290, 280 275 Q265 265, 260 245 L260 190 Z"/>
+    
+    <!-- Nose tip (round) -->
+    <circle cx="368" cy="245" r="18"/>
+    
+    <!-- Lower jaw/chin -->
+    <path d="M260 250 Q265 280, 270 310 Q272 330, 265 345 Q255 355, 240 350 Q230 340, 228 320 Q230 290, 240 265 Z"/>
+    
+    <!-- Cheek curve -->
+    <path d="M190 260 Q170 290, 150 315 Q140 330, 130 330 Q120 325, 122 310 Q130 285, 150 265 Q170 250, 185 250 Z"/>
+    
+    <!-- Neck -->
+    <path d="M160 290 Q150 320, 145 350 Q143 370, 150 385 L190 385 Q200 365, 200 340 Q198 310, 185 285 Z"/>
+    
+    <!-- Eye (small almond shape) -->
+    <ellipse cx="230" cy="180" rx="10" ry="14" fill="#1a5f3a"/>
+    
+    <!-- Eye highlight -->
+    <ellipse cx="232" cy="176" rx="4" ry="5" fill="#fbbf24"/>
+  </g>
+</svg>
