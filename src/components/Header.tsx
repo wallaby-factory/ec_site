@@ -1,10 +1,39 @@
+'use client'
+
+
 import Link from "next/link";
 import { getCurrentUser } from "@/actions/auth";
 import { LogoutButton } from "./LogoutButton";
 import { CartIcon } from "./CartIcon";
+import { useEffect, useState } from "react";
 
-export async function Header() {
-    const user = await getCurrentUser()
+// Define a minimal User type to avoid importing Prisma types in client component if possible, 
+// or let TypeScript infer it from getCurrentUser return type.
+type User = Awaited<ReturnType<typeof getCurrentUser>>;
+
+export function Header() {
+    const [user, setUser] = useState<User>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadUser() {
+            try {
+                const userData = await getCurrentUser();
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to load user", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadUser();
+    }, []);
+
+    // Helper to render skeleton or nothing while loading? 
+    // For now, initiate with null (guest) state to avoid hydration mismatch if we rendered differently,
+    // but actually we want to show meaningful UI ASAP.
+    // To match server/client HTML for hydration, we start with "guest-like" or empty.
+    // Since we are now client-only for this part, sticking to a default view (Guest) until loaded is safest.
 
     return (
         <header className="sticky top-0 z-30 bg-green-900/90 backdrop-blur-md text-white border-b border-green-800 relative overflow-hidden">
@@ -48,7 +77,7 @@ export async function Header() {
                         ギャラリー
                     </Link>
 
-                    {user ? (
+                    {!loading && user ? (
                         <div className="flex items-center gap-4 border-l border-green-700 pl-8">
                             <Link href="/account" className="text-sm font-bold hover:text-yellow-400 transition-colors">
                                 ようこそ {user.nickname || user.name} さん
