@@ -9,7 +9,7 @@ export default function Footer() {
                     <div className="space-y-4">
                         <Link href="/">
                             <img
-                                src="/brand_logo_text.png"
+                                src="/brand_logo_wide.png"
                                 alt="WALLABY FACTORY"
                                 className="h-10 w-auto object-contain"
                             />

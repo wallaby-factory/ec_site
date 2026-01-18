@@ -70,9 +70,9 @@ export function Header() {
                         className="h-14 w-14 object-contain"
                     />
                     <img
-                        src="/brand_logo_text.png"
+                        src="/brand_logo_wide.png"
                         alt="WALLABY FACTORY"
-                        className="h-12 w-auto object-contain"
+                        className="h-10 md:h-12 w-auto object-contain"
                     />
                 </Link>
                 <nav className="hidden md:flex items-center gap-8">
