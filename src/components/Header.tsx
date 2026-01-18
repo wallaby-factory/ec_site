@@ -4,8 +4,12 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/actions/auth";
 import { LogoutButton } from "./LogoutButton";
+import Link from "next/link";
+import { getCurrentUser } from "@/actions/auth";
+import { LogoutButton } from "./LogoutButton";
 import { CartIcon } from "./CartIcon";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // Define a minimal User type to avoid importing Prisma types in client component if possible, 
 // or let TypeScript infer it from getCurrentUser return type.
@@ -14,10 +18,15 @@ type User = Awaited<ReturnType<typeof getCurrentUser>>;
 export function Header() {
     const [user, setUser] = useState<User>(null);
     const [loading, setLoading] = useState(true);
+    const pathname = usePathname();
 
     useEffect(() => {
         async function loadUser() {
             try {
+                // Determine if we should show loading state based on if we already have a user
+                // If we have a user, we might want to silently revalidate without showing loading spinner
+                // But if we are logging in (going from null -> user), we might want to show loading?
+                // For simplicity, let's just fetch.
                 const userData = await getCurrentUser();
                 setUser(userData);
             } catch (err) {
@@ -27,7 +36,7 @@ export function Header() {
             }
         }
         loadUser();
-    }, []);
+    }, [pathname]);
 
     // Helper to render skeleton or nothing while loading? 
     // For now, initiate with null (guest) state to avoid hydration mismatch if we rendered differently,

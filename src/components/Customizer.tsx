@@ -110,7 +110,6 @@ export default function Customizer({ materials = [] }: { materials?: MaterialSta
                     </button>
                 </header>
 
-                <OrderGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Left: Main Configuration Area (2 columns) */}
@@ -488,6 +487,7 @@ export default function Customizer({ materials = [] }: { materials?: MaterialSta
                     </div>
                 </div>
             </div >
+            <OrderGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
         </div >
     )
 }
