@@ -7,12 +7,13 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 border-b border-slate-700 pb-8">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <Link href="/">
-                            <img
-                                src="/brand_logo_wide.png"
-                                alt="WALLABY FACTORY"
-                                className="h-10 w-auto object-contain"
-                            />
+                        <Link href="/" className="block">
+                            <div
+                                className="text-2xl font-bold text-yellow-400 tracking-wider"
+                                style={{ fontFamily: "var(--font-caveat), cursive" }}
+                            >
+                                WALLABY FACTORY
+                            </div>
                         </Link>
                         <p className="text-sm text-slate-400 leading-relaxed">
                             世界に一つだけの、<br />
