@@ -15,6 +15,7 @@ export default function ContactPage() {
         name: '',
         email: '',
         emailConfirm: '',
+        subject: '',
         message: ''
     })
 
@@ -47,7 +48,7 @@ export default function ContactPage() {
         } else {
             toast.success('お問い合わせを送信しました')
             // Redirect or show completion
-            setFormData({ name: '', email: '', emailConfirm: '', message: '' })
+            setFormData({ name: '', email: '', emailConfirm: '', subject: '', message: '' })
             setStep('INPUT') // Reset for now, or could redirect to /contact/complete
             router.push('/')
         }
@@ -115,6 +116,21 @@ export default function ContactPage() {
 
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">
+                                        件名 <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        name="subject"
+                                        type="text"
+                                        required
+                                        value={formData.subject}
+                                        onChange={handleChange}
+                                        className="input-glass w-full rounded-lg p-3"
+                                        placeholder="オーダーメイドに関するお問い合わせ"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">
                                         お問い合わせ内容 <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
@@ -123,7 +139,7 @@ export default function ContactPage() {
                                         rows={8}
                                         value={formData.message}
                                         onChange={handleChange}
-                                        className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none transition resize-none"
+                                        className="input-glass w-full rounded-lg p-3 resize-none"
                                         placeholder="お問い合わせ内容をご記入ください..."
                                     ></textarea>
                                 </div>

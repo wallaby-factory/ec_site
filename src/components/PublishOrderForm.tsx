@@ -172,17 +172,29 @@ export function PublishOrderForm({ orderItemId, onSuccess, onCancel }: PublishOr
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                     商品画像 (1〜3枚) <span className="text-red-500">*</span>
                 </label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileSelect}
-                    disabled={isSubmitting || selectedFiles.length >= 3}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 disabled:opacity-50"
-                />
-                <p className="text-xs text-slate-500 mt-1">
-                    JPG, PNG, GIF形式に対応。最大3枚まで選択可能です。
-                </p>
+                <div className="relative">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        id="image-upload"
+                        onChange={handleFileSelect}
+                        disabled={isSubmitting || selectedFiles.length >= 3}
+                        className="hidden"
+                    />
+                    <label
+                        htmlFor="image-upload"
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-green-300 text-green-700 bg-green-50 hover:bg-green-100 transition-colors cursor-pointer ${isSubmitting || selectedFiles.length >= 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        画像を選択 ({selectedFiles.length}/3)
+                    </label>
+                    <p className="text-xs text-slate-500 mt-2">
+                        JPG, PNG, GIF形式に対応。最大3枚までアップロード可能です。
+                    </p>
+                </div>
             </div>
 
             {/* Error Message */}

@@ -37,7 +37,7 @@ export default function OrderGuideModal({ isOpen, onClose }: OrderGuideModalProp
                     </button>
                 </div>
 
-                <div className="p-6 space-y-8 overflow-y-auto flex-1">
+                <div className="p-6 space-y-8 overflow-y-auto flex-1 scrollbar-thin">
                     {/* Method */}
                     <section>
                         <h3 className="text-lg font-bold text-slate-800 mb-3 pb-1 border-b border-green-200">

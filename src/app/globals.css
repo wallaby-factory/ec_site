@@ -36,6 +36,11 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+button {
+  cursor: pointer;
 }
 
 /* Aesthetic Overhaul Styles - v3 Photo Revert */
@@ -55,7 +60,7 @@ body {
 }
 
 .input-glass {
-  background: rgba(255, 255, 255, 1.0) !important;
+  background: #ffffff !important;
   border: 2px solid rgba(203, 213, 225, 1.0) !important;
   @apply focus:border-green-500 focus:outline-none transition-all shadow-sm;
 }
@@ -65,7 +70,29 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.dark .input-glass {
-  background: rgba(15, 23, 42, 0.2) !important;
-  color: white;
+background: rgba(15, 23, 42, 0.2) !important;
+color: white;
+}
+
+/* Custom Scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
 }

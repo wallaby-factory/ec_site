@@ -4,10 +4,11 @@ export async function sendContact(formData: FormData) {
     const name = formData.get('name') as string
     const email = formData.get('email') as string
     const emailConfirm = formData.get('emailConfirm') as string
+    const subject = formData.get('subject') as string
     const message = formData.get('message') as string
 
     // Validation
-    if (!name || !email || !emailConfirm || !message) {
+    if (!name || !email || !emailConfirm || !subject || !message) {
         return { error: 'すべての項目を入力してください' }
     }
 
@@ -19,6 +20,7 @@ export async function sendContact(formData: FormData) {
     console.log('--- START: CONTACT FORM SUBMISSION ---')
     console.log(`To: ${email}`) // Auto-reply
     console.log(`Subject: 【WALLABY FACTORY】お問い合わせありがとうございます`)
+    console.log(`Original Subject: ${subject}`)
     console.log(`Body:`)
     console.log(`${name} 様`)
     console.log(`この度はお問い合わせいただきありがとうございます。`)
