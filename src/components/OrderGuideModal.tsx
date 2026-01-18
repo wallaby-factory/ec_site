@@ -19,8 +19,8 @@ export default function OrderGuideModal({ isOpen, onClose }: OrderGuideModalProp
             ></div>
 
             {/* Modal Content */}
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-                <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-100 p-4 flex justify-between items-center z-10">
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+                <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-100 p-4 shrink-0 flex justify-between items-center z-10">
                     <h2 className="text-xl font-bold text-green-800 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
@@ -37,7 +37,7 @@ export default function OrderGuideModal({ isOpen, onClose }: OrderGuideModalProp
                     </button>
                 </div>
 
-                <div className="p-6 space-y-8">
+                <div className="p-6 space-y-8 overflow-y-auto flex-1">
                     {/* Method */}
                     <section>
                         <h3 className="text-lg font-bold text-slate-800 mb-3 pb-1 border-b border-green-200">
@@ -142,7 +142,7 @@ export default function OrderGuideModal({ isOpen, onClose }: OrderGuideModalProp
                     </section>
                 </div>
 
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-center sticky bottom-0 rounded-b-2xl">
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-center shrink-0">
                     <button
                         onClick={onClose}
                         className="px-8 py-2 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-700 transition-colors shadow-sm"

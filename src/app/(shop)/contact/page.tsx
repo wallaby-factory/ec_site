@@ -77,7 +77,7 @@ export default function ContactPage() {
                                         required
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none transition"
+                                        className="input-glass w-full rounded-lg p-3"
                                         placeholder="山田 太郎"
                                     />
                                 </div>
@@ -93,7 +93,7 @@ export default function ContactPage() {
                                             required
                                             value={formData.email}
                                             onChange={handleChange}
-                                            className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none transition"
+                                            className="input-glass w-full rounded-lg p-3"
                                             placeholder="email@example.com"
                                         />
                                     </div>
@@ -107,7 +107,7 @@ export default function ContactPage() {
                                             required
                                             value={formData.emailConfirm}
                                             onChange={handleChange}
-                                            className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none transition"
+                                            className="input-glass w-full rounded-lg p-3"
                                             placeholder="email@example.com"
                                         />
                                     </div>

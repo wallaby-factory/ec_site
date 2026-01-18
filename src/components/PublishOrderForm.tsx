@@ -22,23 +22,30 @@ export function PublishOrderForm({ orderItemId, onSuccess, onCancel }: PublishOr
 
     function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const files = Array.from(e.target.files || [])
+        if (files.length === 0) return
 
-        if (files.length > 3) {
+        // Calculate total files after valid addition
+        const currentCount = selectedFiles.length
+        if (currentCount + files.length > 3) {
             setError('画像は最大3枚まで選択できます')
-            return
-        }
-
-        if (files.length === 0) {
-            setError('少なくとも1枚の画像を選択してください')
+            // Reset input even on error so user can try again
+            e.target.value = ''
             return
         }
 
         setError('')
-        setSelectedFiles(files)
 
-        // Create previews
+        // Filter out duplicates if needed, or just append
+        // For simplicity/UX, we'll append. 
+        // Create previews for new files
         const newPreviews = files.map(file => URL.createObjectURL(file))
-        setPreviews(newPreviews)
+
+        setSelectedFiles(prev => [...prev, ...files])
+        setPreviews(prev => [...prev, ...newPreviews])
+
+        // Reset input to allow selecting the same file again if needed
+        // and to prevent "1 file selected" text from persisting if user removes it
+        e.target.value = ''
     }
 
     function removeImage(index: number) {
@@ -170,7 +177,7 @@ export function PublishOrderForm({ orderItemId, onSuccess, onCancel }: PublishOr
                     accept="image/*"
                     multiple
                     onChange={handleFileSelect}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || selectedFiles.length >= 3}
                     className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 disabled:opacity-50"
                 />
                 <p className="text-xs text-slate-500 mt-1">
