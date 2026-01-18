@@ -83,13 +83,15 @@ export async function register(formData: FormData) {
             }
         })
 
-        const cookieStore = await cookies()
-        cookieStore.set(SESSION_COOKIE, user.id, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+        // Auto-login removed as requested.
+        // const cookieStore = await cookies()
+        // cookieStore.set(SESSION_COOKIE, user.id, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
     } catch (e) {
         console.error(e)
         return { error: 'ユーザー登録に失敗しました。' }
     }
-    redirect('/account')
+    // Redirect to login page with success flag
+    redirect('/login?registered=true')
 }
 
 export async function login(formData: FormData) {
