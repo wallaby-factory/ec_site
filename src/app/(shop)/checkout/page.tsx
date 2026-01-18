@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { createOrder } from '@/actions/order'
+import { getUserPointState } from '@/actions/point'
 
 export default function CheckoutPage() {
     const { cart, totalPrice, clearCart } = useCart()
@@ -12,34 +13,45 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // In a real app, we would load the user's address here if logged in.
-    // For now, let's assume the Server Action will handle pulling the user's address from their profile 
-    // if we pass the user ID (which we'll get from the session on the server side).
-    // But wait, this is a Client Component. We need to trigger the action.
+    // Point System State
+    const [totalPoints, setTotalPoints] = useState(0)
+    const [usedPoints, setUsedPoints] = useState(0)
+    const [isPointsExpired, setIsPointsExpired] = useState(false)
+    const [loadingPoints, setLoadingPoints] = useState(true)
 
-    // Simplification for MVP: We just show a "Confirm Order" button that calls the server action.
-    // The server action will check if user is logged in. If not, it should probably fail or redirect in middleware.
-    // Ideally, we should check login state here. But let's let the server action handle the heavy lifting.
+    useEffect(() => {
+        // Fetch user points on mount
+        getUserPointState().then(result => {
+            if (result.success && result.state) {
+                setTotalPoints(result.state.currentPoints)
+                setIsPointsExpired(result.state.isExpired)
+            }
+            setLoadingPoints(false)
+        })
+    }, [])
 
-    // Better UX: Show a form that is pre-filled if user is logged in (passed via props? or fetching?).
-    // Let's implement a simple view that assumes the user has confirmed their address in /account.
-    // "登録済みの住所に発送します" (Will ship to registered address).
+    const shippingFee = totalPrice >= 10000 ? 0 : 350
+    const grandTotal = totalPrice + shippingFee
+    const finalPayment = Math.max(0, grandTotal - usedPoints)
+    const earnedPoints = Math.floor(finalPayment * 0.05)
+
+    const handlePointChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseInt(e.target.value) || 0
+        // Clamp between 0 and min(totalPoints, grandTotal)
+        const maxUse = Math.min(totalPoints, grandTotal)
+        if (val < 0) return
+        if (val > maxUse) {
+            setUsedPoints(maxUse)
+        } else {
+            setUsedPoints(val)
+        }
+    }
 
     const handleOrder = async () => {
         setLoading(true)
         setError(null)
 
         try {
-            // Transform cart items to format expected by server
-            // Note: Colors are objects in CartItem {name, hex}, but DB expects strings? 
-            // In schema: colorFabric (String), colorZipper (String), etc.
-            // Let's assume we store the HEX or NAME. The schema typically stores identifiers or names.
-            // Let's verify schema... OrderItem model has String for colors.
-            // Let's pass the HEX codes or NAMES. Probably NAMES is safer for human readability, 
-            // but for exact reproduction HEX is better. Let's store HEX? 
-            // Wait, previous simple order impl stored Strings. The seed data used "Green", "Black".
-            // Let's store the NAME for now as it maps to the predefined list.
-
             const orderItems = cart.map(item => ({
                 shape: item.shape,
                 width: item.width,
@@ -47,18 +59,19 @@ export default function CheckoutPage() {
                 depth: item.depth,
                 diameter: item.diameter,
                 colorFabric: item.fabricColor.name,
-                colorZipper: item.cordColor.name, // "cord" in schema is colorZipper for legacy reasons or we should rename? Schema comment said "String" (cord).
+                colorZipper: item.cordColor.name,
                 colorFastener: item.stopperColor.name,
                 cordCount: item.cordCount,
                 quantity: item.quantity,
                 price: item.unitPrice
             }))
 
-            const result = await createOrder(orderItems)
+            // Pass usedPoints to createOrder
+            const result = await createOrder(orderItems, usedPoints)
 
             if (result.success) {
                 clearCart()
-                router.push(`/account?success=true`) // Redirect to account page with success message
+                router.push(`/account?success=true`)
             } else {
                 setError(result.error || '注文の処理中にエラーが発生しました。ログインしているか確認してください。')
             }
@@ -94,6 +107,7 @@ export default function CheckoutPage() {
                     )}
 
                     <div className="space-y-6 mb-8">
+                        {/* Address Section */}
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
                             <span className="text-2xl">📍</span>
                             <div>
@@ -107,6 +121,7 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
+                        {/* Order Items */}
                         <div>
                             <h3 className="font-bold text-slate-700 mb-2">注文内容</h3>
                             <div className="border border-slate-200 rounded-lg divide-y">
@@ -131,6 +146,61 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
+                        {/* Point Usage Section */}
+                        <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+                            <h3 className="font-bold text-green-900 mb-2 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" />
+                                </svg>
+                                ポイント利用
+                            </h3>
+
+                            {loadingPoints ? (
+                                <p className="text-sm text-green-700">読み込み中...</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-sm text-green-800">保有ポイント</span>
+                                        <div className="text-right">
+                                            <span className="text-2xl font-bold text-green-700">
+                                                {totalPoints.toLocaleString()}
+                                            </span>
+                                            <span className="text-xs text-green-600 ml-1">pt</span>
+                                        </div>
+                                    </div>
+
+                                    {isPointsExpired && (
+                                        <div className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
+                                            ※ 有効期限切れのためポイントは失効しました
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="number"
+                                            value={usedPoints > 0 ? usedPoints : ''}
+                                            onChange={handlePointChange}
+                                            placeholder="0"
+                                            disabled={totalPoints === 0}
+                                            className="flex-1 px-4 py-2 rounded-lg border border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-right font-bold text-slate-700 disabled:bg-slate-100 disabled:text-slate-400"
+                                        />
+                                        <span className="text-sm text-green-800 font-bold whitespace-nowrap">pt 利用する</span>
+                                    </div>
+
+                                    <div className="text-right">
+                                        <button
+                                            onClick={() => setUsedPoints(Math.min(totalPoints, grandTotal))}
+                                            disabled={totalPoints === 0 || usedPoints === Math.min(totalPoints, grandTotal)}
+                                            className="text-xs text-green-600 hover:text-green-800 underline disabled:opacity-50 disabled:no-underline"
+                                        >
+                                            すべて利用する
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Calculation Summary */}
                         <div className="space-y-2 py-4 border-t border-slate-200">
                             <div className="flex justify-between text-slate-600">
                                 <span>商品小計</span>
@@ -144,11 +214,24 @@ export default function CheckoutPage() {
                                     <span>¥350</span>
                                 )}
                             </div>
+                            {usedPoints > 0 && (
+                                <div className="flex justify-between text-green-600 font-bold">
+                                    <span>ポイント利用</span>
+                                    <span>- {usedPoints.toLocaleString()} pt</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-between items-center py-4 border-t-2 border-slate-300">
-                            <span className="text-xl font-bold text-slate-800">合計金額 (税込)</span>
-                            <span className="text-3xl font-black text-green-700">¥{(totalPrice + (totalPrice >= 10000 ? 0 : 350)).toLocaleString()}</span>
+                            <div>
+                                <span className="text-xl font-bold text-slate-800 block">お支払い金額 (税込)</span>
+                                {earnedPoints > 0 && (
+                                    <span className="text-xs text-blue-600 font-bold mt-1 block">
+                                        ✨ 今回の獲得予定: {earnedPoints.toLocaleString()} pt
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-3xl font-black text-green-700">¥{finalPayment.toLocaleString()}</span>
                         </div>
                     </div>
 

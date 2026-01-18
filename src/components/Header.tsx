@@ -69,12 +69,11 @@ export function Header() {
                         alt="Wallaby Logo"
                         className="h-14 w-14 object-contain"
                     />
-                    <span
-                        className="text-3xl tracking-tight text-yellow-400"
-                        style={{ fontFamily: "var(--font-caveat), cursive", fontWeight: 700 }}
-                    >
-                        WALLABY FACTORY
-                    </span>
+                    <img
+                        src="/brand_logo_text.png"
+                        alt="WALLABY FACTORY"
+                        className="h-12 w-auto object-contain"
+                    />
                 </Link>
                 <nav className="hidden md:flex items-center gap-8">
                     <Link href="/customizer" className="text-sm font-bold hover:text-yellow-400 transition-colors">

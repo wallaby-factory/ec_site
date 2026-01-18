@@ -1471,6 +1471,7 @@ export namespace Prisma {
     building: string | null
     password: string | null
     points: number | null
+    lastPurchaseAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1488,6 +1489,7 @@ export namespace Prisma {
     building: string | null
     password: string | null
     points: number | null
+    lastPurchaseAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1505,6 +1507,7 @@ export namespace Prisma {
     building: number
     password: number
     points: number
+    lastPurchaseAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1532,6 +1535,7 @@ export namespace Prisma {
     building?: true
     password?: true
     points?: true
+    lastPurchaseAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1549,6 +1553,7 @@ export namespace Prisma {
     building?: true
     password?: true
     points?: true
+    lastPurchaseAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1566,6 +1571,7 @@ export namespace Prisma {
     building?: true
     password?: true
     points?: true
+    lastPurchaseAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1670,6 +1676,7 @@ export namespace Prisma {
     building: string | null
     password: string
     points: number
+    lastPurchaseAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1706,6 +1713,7 @@ export namespace Prisma {
     building?: boolean
     password?: boolean
     points?: boolean
+    lastPurchaseAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     orders?: boolean | User$ordersArgs<ExtArgs>
@@ -1727,6 +1735,7 @@ export namespace Prisma {
     building?: boolean
     password?: boolean
     points?: boolean
+    lastPurchaseAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1744,6 +1753,7 @@ export namespace Prisma {
     building?: boolean
     password?: boolean
     points?: boolean
+    lastPurchaseAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -1776,6 +1786,7 @@ export namespace Prisma {
       building: string | null
       password: string
       points: number
+      lastPurchaseAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2186,6 +2197,7 @@ export namespace Prisma {
     readonly building: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
     readonly points: FieldRef<"User", 'Int'>
+    readonly lastPurchaseAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -2393,6 +2405,7 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -2407,6 +2420,7 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3357,6 +3371,7 @@ export namespace Prisma {
      * The data used to create many AdminUsers.
      */
     data: AdminUserCreateManyInput | AdminUserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3371,6 +3386,7 @@ export namespace Prisma {
      * The data used to create many AdminUsers.
      */
     data: AdminUserCreateManyInput | AdminUserCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3476,10 +3492,14 @@ export namespace Prisma {
 
   export type OrderAvgAggregateOutputType = {
     totalAmount: number | null
+    usedPoints: number | null
+    earnedPoints: number | null
   }
 
   export type OrderSumAggregateOutputType = {
     totalAmount: number | null
+    usedPoints: number | null
+    earnedPoints: number | null
   }
 
   export type OrderMinAggregateOutputType = {
@@ -3487,6 +3507,8 @@ export namespace Prisma {
     userId: string | null
     status: string | null
     totalAmount: number | null
+    usedPoints: number | null
+    earnedPoints: number | null
     shippingName: string | null
     shippingZip: string | null
     shippingAddress: string | null
@@ -3499,6 +3521,8 @@ export namespace Prisma {
     userId: string | null
     status: string | null
     totalAmount: number | null
+    usedPoints: number | null
+    earnedPoints: number | null
     shippingName: string | null
     shippingZip: string | null
     shippingAddress: string | null
@@ -3511,6 +3535,8 @@ export namespace Prisma {
     userId: number
     status: number
     totalAmount: number
+    usedPoints: number
+    earnedPoints: number
     shippingName: number
     shippingZip: number
     shippingAddress: number
@@ -3522,10 +3548,14 @@ export namespace Prisma {
 
   export type OrderAvgAggregateInputType = {
     totalAmount?: true
+    usedPoints?: true
+    earnedPoints?: true
   }
 
   export type OrderSumAggregateInputType = {
     totalAmount?: true
+    usedPoints?: true
+    earnedPoints?: true
   }
 
   export type OrderMinAggregateInputType = {
@@ -3533,6 +3563,8 @@ export namespace Prisma {
     userId?: true
     status?: true
     totalAmount?: true
+    usedPoints?: true
+    earnedPoints?: true
     shippingName?: true
     shippingZip?: true
     shippingAddress?: true
@@ -3545,6 +3577,8 @@ export namespace Prisma {
     userId?: true
     status?: true
     totalAmount?: true
+    usedPoints?: true
+    earnedPoints?: true
     shippingName?: true
     shippingZip?: true
     shippingAddress?: true
@@ -3557,6 +3591,8 @@ export namespace Prisma {
     userId?: true
     status?: true
     totalAmount?: true
+    usedPoints?: true
+    earnedPoints?: true
     shippingName?: true
     shippingZip?: true
     shippingAddress?: true
@@ -3656,6 +3692,8 @@ export namespace Prisma {
     userId: string | null
     status: string
     totalAmount: number
+    usedPoints: number
+    earnedPoints: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -3687,6 +3725,8 @@ export namespace Prisma {
     userId?: boolean
     status?: boolean
     totalAmount?: boolean
+    usedPoints?: boolean
+    earnedPoints?: boolean
     shippingName?: boolean
     shippingZip?: boolean
     shippingAddress?: boolean
@@ -3702,6 +3742,8 @@ export namespace Prisma {
     userId?: boolean
     status?: boolean
     totalAmount?: boolean
+    usedPoints?: boolean
+    earnedPoints?: boolean
     shippingName?: boolean
     shippingZip?: boolean
     shippingAddress?: boolean
@@ -3715,6 +3757,8 @@ export namespace Prisma {
     userId?: boolean
     status?: boolean
     totalAmount?: boolean
+    usedPoints?: boolean
+    earnedPoints?: boolean
     shippingName?: boolean
     shippingZip?: boolean
     shippingAddress?: boolean
@@ -3742,6 +3786,8 @@ export namespace Prisma {
       userId: string | null
       status: string
       totalAmount: number
+      usedPoints: number
+      earnedPoints: number
       shippingName: string
       shippingZip: string
       shippingAddress: string
@@ -4146,6 +4192,8 @@ export namespace Prisma {
     readonly userId: FieldRef<"Order", 'String'>
     readonly status: FieldRef<"Order", 'String'>
     readonly totalAmount: FieldRef<"Order", 'Int'>
+    readonly usedPoints: FieldRef<"Order", 'Int'>
+    readonly earnedPoints: FieldRef<"Order", 'Int'>
     readonly shippingName: FieldRef<"Order", 'String'>
     readonly shippingZip: FieldRef<"Order", 'String'>
     readonly shippingAddress: FieldRef<"Order", 'String'>
@@ -4356,6 +4404,7 @@ export namespace Prisma {
      * The data used to create many Orders.
      */
     data: OrderCreateManyInput | OrderCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -4370,6 +4419,7 @@ export namespace Prisma {
      * The data used to create many Orders.
      */
     data: OrderCreateManyInput | OrderCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5476,6 +5526,7 @@ export namespace Prisma {
      * The data used to create many OrderItems.
      */
     data: OrderItemCreateManyInput | OrderItemCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -5490,6 +5541,7 @@ export namespace Prisma {
      * The data used to create many OrderItems.
      */
     data: OrderItemCreateManyInput | OrderItemCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6577,6 +6629,7 @@ export namespace Prisma {
      * The data used to create many PublicOrders.
      */
     data: PublicOrderCreateManyInput | PublicOrderCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -6591,6 +6644,7 @@ export namespace Prisma {
      * The data used to create many PublicOrders.
      */
     data: PublicOrderCreateManyInput | PublicOrderCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7542,6 +7596,7 @@ export namespace Prisma {
      * The data used to create many PointTransactions.
      */
     data: PointTransactionCreateManyInput | PointTransactionCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -7556,6 +7611,7 @@ export namespace Prisma {
      * The data used to create many PointTransactions.
      */
     data: PointTransactionCreateManyInput | PointTransactionCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8438,6 +8494,7 @@ export namespace Prisma {
      * The data used to create many Materials.
      */
     data: MaterialCreateManyInput | MaterialCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -8452,6 +8509,7 @@ export namespace Prisma {
      * The data used to create many Materials.
      */
     data: MaterialCreateManyInput | MaterialCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -8548,6 +8606,9 @@ export namespace Prisma {
    */
 
   export const TransactionIsolationLevel: {
+    ReadUncommitted: 'ReadUncommitted',
+    ReadCommitted: 'ReadCommitted',
+    RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
   };
 
@@ -8567,6 +8628,7 @@ export namespace Prisma {
     building: 'building',
     password: 'password',
     points: 'points',
+    lastPurchaseAt: 'lastPurchaseAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8591,6 +8653,8 @@ export namespace Prisma {
     userId: 'userId',
     status: 'status',
     totalAmount: 'totalAmount',
+    usedPoints: 'usedPoints',
+    earnedPoints: 'earnedPoints',
     shippingName: 'shippingName',
     shippingZip: 'shippingZip',
     shippingAddress: 'shippingAddress',
@@ -8671,6 +8735,14 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
   export const NullsOrder: {
     first: 'first',
     last: 'last'
@@ -8692,6 +8764,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'String[]'
+   */
+  export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -8699,9 +8778,23 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -8716,6 +8809,13 @@ export namespace Prisma {
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -8738,6 +8838,7 @@ export namespace Prisma {
     building?: StringNullableFilter<"User"> | string | null
     password?: StringFilter<"User"> | string
     points?: IntFilter<"User"> | number
+    lastPurchaseAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     orders?: OrderListRelationFilter
@@ -8758,6 +8859,7 @@ export namespace Prisma {
     building?: SortOrderInput | SortOrder
     password?: SortOrder
     points?: SortOrder
+    lastPurchaseAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     orders?: OrderOrderByRelationAggregateInput
@@ -8781,6 +8883,7 @@ export namespace Prisma {
     building?: StringNullableFilter<"User"> | string | null
     password?: StringFilter<"User"> | string
     points?: IntFilter<"User"> | number
+    lastPurchaseAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     orders?: OrderListRelationFilter
@@ -8801,6 +8904,7 @@ export namespace Prisma {
     building?: SortOrderInput | SortOrder
     password?: SortOrder
     points?: SortOrder
+    lastPurchaseAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -8826,6 +8930,7 @@ export namespace Prisma {
     building?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringWithAggregatesFilter<"User"> | string
     points?: IntWithAggregatesFilter<"User"> | number
+    lastPurchaseAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -8895,6 +9000,8 @@ export namespace Prisma {
     userId?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
     totalAmount?: IntFilter<"Order"> | number
+    usedPoints?: IntFilter<"Order"> | number
+    earnedPoints?: IntFilter<"Order"> | number
     shippingName?: StringFilter<"Order"> | string
     shippingZip?: StringFilter<"Order"> | string
     shippingAddress?: StringFilter<"Order"> | string
@@ -8909,6 +9016,8 @@ export namespace Prisma {
     userId?: SortOrderInput | SortOrder
     status?: SortOrder
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
     shippingName?: SortOrder
     shippingZip?: SortOrder
     shippingAddress?: SortOrder
@@ -8926,6 +9035,8 @@ export namespace Prisma {
     userId?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
     totalAmount?: IntFilter<"Order"> | number
+    usedPoints?: IntFilter<"Order"> | number
+    earnedPoints?: IntFilter<"Order"> | number
     shippingName?: StringFilter<"Order"> | string
     shippingZip?: StringFilter<"Order"> | string
     shippingAddress?: StringFilter<"Order"> | string
@@ -8940,6 +9051,8 @@ export namespace Prisma {
     userId?: SortOrderInput | SortOrder
     status?: SortOrder
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
     shippingName?: SortOrder
     shippingZip?: SortOrder
     shippingAddress?: SortOrder
@@ -8960,6 +9073,8 @@ export namespace Prisma {
     userId?: StringNullableWithAggregatesFilter<"Order"> | string | null
     status?: StringWithAggregatesFilter<"Order"> | string
     totalAmount?: IntWithAggregatesFilter<"Order"> | number
+    usedPoints?: IntWithAggregatesFilter<"Order"> | number
+    earnedPoints?: IntWithAggregatesFilter<"Order"> | number
     shippingName?: StringWithAggregatesFilter<"Order"> | string
     shippingZip?: StringWithAggregatesFilter<"Order"> | string
     shippingAddress?: StringWithAggregatesFilter<"Order"> | string
@@ -9294,6 +9409,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderCreateNestedManyWithoutUserInput
@@ -9314,6 +9430,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
@@ -9334,6 +9451,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUpdateManyWithoutUserNestedInput
@@ -9354,6 +9472,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -9374,6 +9493,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9391,6 +9511,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9408,6 +9529,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9479,6 +9601,8 @@ export namespace Prisma {
     id?: string
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -9493,6 +9617,8 @@ export namespace Prisma {
     userId?: string | null
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -9505,6 +9631,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -9519,6 +9647,8 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -9532,6 +9662,8 @@ export namespace Prisma {
     userId?: string | null
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -9543,6 +9675,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -9555,6 +9689,8 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -9911,8 +10047,8 @@ export namespace Prisma {
 
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -9920,13 +10056,14 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -9934,13 +10071,14 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -9948,10 +10086,21 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -10007,6 +10156,7 @@ export namespace Prisma {
     building?: SortOrder
     password?: SortOrder
     points?: SortOrder
+    lastPurchaseAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10028,6 +10178,7 @@ export namespace Prisma {
     building?: SortOrder
     password?: SortOrder
     points?: SortOrder
+    lastPurchaseAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10045,6 +10196,7 @@ export namespace Prisma {
     building?: SortOrder
     password?: SortOrder
     points?: SortOrder
+    lastPurchaseAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10055,8 +10207,8 @@ export namespace Prisma {
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10064,6 +10216,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -10072,8 +10225,8 @@ export namespace Prisma {
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10081,6 +10234,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -10089,8 +10243,8 @@ export namespace Prisma {
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10103,10 +10257,24 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -10164,6 +10332,8 @@ export namespace Prisma {
     userId?: SortOrder
     status?: SortOrder
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
     shippingName?: SortOrder
     shippingZip?: SortOrder
     shippingAddress?: SortOrder
@@ -10173,6 +10343,8 @@ export namespace Prisma {
 
   export type OrderAvgOrderByAggregateInput = {
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
@@ -10180,6 +10352,8 @@ export namespace Prisma {
     userId?: SortOrder
     status?: SortOrder
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
     shippingName?: SortOrder
     shippingZip?: SortOrder
     shippingAddress?: SortOrder
@@ -10192,6 +10366,8 @@ export namespace Prisma {
     userId?: SortOrder
     status?: SortOrder
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
     shippingName?: SortOrder
     shippingZip?: SortOrder
     shippingAddress?: SortOrder
@@ -10201,12 +10377,14 @@ export namespace Prisma {
 
   export type OrderSumOrderByAggregateInput = {
     totalAmount?: SortOrder
+    usedPoints?: SortOrder
+    earnedPoints?: SortOrder
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10289,8 +10467,8 @@ export namespace Prisma {
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10510,6 +10688,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -10712,8 +10894,8 @@ export namespace Prisma {
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10726,8 +10908,8 @@ export namespace Prisma {
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10740,8 +10922,8 @@ export namespace Prisma {
 
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10749,10 +10931,21 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -10762,8 +10955,8 @@ export namespace Prisma {
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10779,8 +10972,8 @@ export namespace Prisma {
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -10796,8 +10989,8 @@ export namespace Prisma {
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10807,8 +11000,8 @@ export namespace Prisma {
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10823,8 +11016,8 @@ export namespace Prisma {
 
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -10832,10 +11025,24 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -10848,8 +11055,8 @@ export namespace Prisma {
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -10864,8 +11071,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -10890,6 +11097,8 @@ export namespace Prisma {
     id?: string
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -10902,6 +11111,8 @@ export namespace Prisma {
     id?: string
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -10917,6 +11128,7 @@ export namespace Prisma {
 
   export type OrderCreateManyUserInputEnvelope = {
     data: OrderCreateManyUserInput | OrderCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type PublicOrderCreateWithoutUserInput = {
@@ -10960,6 +11172,7 @@ export namespace Prisma {
 
   export type PublicOrderCreateManyUserInputEnvelope = {
     data: PublicOrderCreateManyUserInput | PublicOrderCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type PointTransactionCreateWithoutUserInput = {
@@ -10983,6 +11196,7 @@ export namespace Prisma {
 
   export type PointTransactionCreateManyUserInputEnvelope = {
     data: PointTransactionCreateManyUserInput | PointTransactionCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type OrderUpsertWithWhereUniqueWithoutUserInput = {
@@ -11009,6 +11223,8 @@ export namespace Prisma {
     userId?: StringNullableFilter<"Order"> | string | null
     status?: StringFilter<"Order"> | string
     totalAmount?: IntFilter<"Order"> | number
+    usedPoints?: IntFilter<"Order"> | number
+    earnedPoints?: IntFilter<"Order"> | number
     shippingName?: StringFilter<"Order"> | string
     shippingZip?: StringFilter<"Order"> | string
     shippingAddress?: StringFilter<"Order"> | string
@@ -11093,6 +11309,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     publicOrders?: PublicOrderCreateNestedManyWithoutUserInput
@@ -11112,6 +11329,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     publicOrders?: PublicOrderUncheckedCreateNestedManyWithoutUserInput
@@ -11160,6 +11378,7 @@ export namespace Prisma {
 
   export type OrderItemCreateManyOrderInputEnvelope = {
     data: OrderItemCreateManyOrderInput | OrderItemCreateManyOrderInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutOrdersInput = {
@@ -11186,6 +11405,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     publicOrders?: PublicOrderUpdateManyWithoutUserNestedInput
@@ -11205,6 +11425,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     publicOrders?: PublicOrderUncheckedUpdateManyWithoutUserNestedInput
@@ -11250,6 +11471,8 @@ export namespace Prisma {
     id?: string
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -11263,6 +11486,8 @@ export namespace Prisma {
     userId?: string | null
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -11290,6 +11515,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -11303,6 +11530,8 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -11323,6 +11552,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderCreateNestedManyWithoutUserInput
@@ -11342,6 +11572,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
@@ -11377,6 +11608,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUpdateManyWithoutUserNestedInput
@@ -11396,6 +11628,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -11415,6 +11648,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderCreateNestedManyWithoutUserInput
@@ -11434,6 +11668,7 @@ export namespace Prisma {
     building?: string | null
     password?: string
     points?: number
+    lastPurchaseAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
@@ -11469,6 +11704,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUpdateManyWithoutUserNestedInput
@@ -11488,6 +11724,7 @@ export namespace Prisma {
     building?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     points?: IntFieldUpdateOperationsInput | number
+    lastPurchaseAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -11498,6 +11735,8 @@ export namespace Prisma {
     id?: string
     status?: string
     totalAmount: number
+    usedPoints?: number
+    earnedPoints?: number
     shippingName: string
     shippingZip: string
     shippingAddress: string
@@ -11533,6 +11772,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -11545,6 +11786,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
@@ -11557,6 +11800,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalAmount?: IntFieldUpdateOperationsInput | number
+    usedPoints?: IntFieldUpdateOperationsInput | number
+    earnedPoints?: IntFieldUpdateOperationsInput | number
     shippingName?: StringFieldUpdateOperationsInput | string
     shippingZip?: StringFieldUpdateOperationsInput | string
     shippingAddress?: StringFieldUpdateOperationsInput | string

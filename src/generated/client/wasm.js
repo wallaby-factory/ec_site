@@ -116,6 +116,9 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -132,6 +135,7 @@ exports.Prisma.UserScalarFieldEnum = {
   building: 'building',
   password: 'password',
   points: 'points',
+  lastPurchaseAt: 'lastPurchaseAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -150,6 +154,8 @@ exports.Prisma.OrderScalarFieldEnum = {
   userId: 'userId',
   status: 'status',
   totalAmount: 'totalAmount',
+  usedPoints: 'usedPoints',
+  earnedPoints: 'earnedPoints',
   shippingName: 'shippingName',
   shippingZip: 'shippingZip',
   shippingAddress: 'shippingAddress',
@@ -210,6 +216,11 @@ exports.Prisma.MaterialScalarFieldEnum = {
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {

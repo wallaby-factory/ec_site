@@ -26,6 +26,7 @@ model User {
   password      String    @default("") // Ideally should be hashed, plain/simple for now as requested
   // role field removed - User is strictly for customers
   points        Int       @default(0)
+  lastPurchaseAt DateTime? // For point expiration tracking
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
@@ -50,6 +51,9 @@ model Order {
   
   status        String      @default("PENDING") // PENDING, SEWING, SHIPPED, DELIVERED
   totalAmount   Int
+  
+  usedPoints    Int         @default(0)
+  earnedPoints  Int         @default(0)
   
   shippingName    String
   shippingZip     String
