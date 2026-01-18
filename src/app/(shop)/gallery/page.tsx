@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import Image from 'next/image'
 import BagModel from '@/components/BagModel'
 
 export default async function GalleryPage({
@@ -88,70 +89,91 @@ export default async function GalleryPage({
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {publicOrders.map((order) => (
-                                <div key={order.id} className="card-outdoor flex flex-col h-full group hover:shadow-2xl transition-shadow relative">
-                                    {/* 3D Preview (Small) - Link to Detail */}
-                                    <Link href={`/gallery/${order.id}`} className="block group cursor-pointer">
-                                        <div className="aspect-square relative flex items-center justify-center bg-slate-900 border-b border-slate-100 dark:border-slate-700 overflow-hidden">
-                                            <div className="w-full h-full transform transition-transform duration-700 group-hover:scale-105">
-                                                <BagModel
-                                                    width={order.width}
-                                                    height={order.height}
-                                                    depth={order.depth || 10}
-                                                    diameter={order.diameter || 15}
-                                                    shape={order.shape as 'SQUARE' | 'CYLINDER' | 'CUBE'}
-                                                    fabricColor="/assets/fabrics/mesh_green.jpeg" // Default for gallery preview
-                                                    cordColor="#facc15"
-                                                    stopperColor="#000000"
-                                                />
-                                            </div>
-                                            <div className="absolute top-4 right-4 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                                3D VIEW
-                                            </div>
-                                        </div>
-                                    </Link>
+                            {publicOrders.map((order) => {
+                                let images: string[] = []
+                                try {
+                                    images = JSON.parse(order.productImages || '[]')
+                                } catch (e) {
+                                    images = []
+                                }
+                                const mainImage = images[0] || order.imageUrl
 
-                                    <div className="p-6 flex-1 flex flex-col">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <Link href={`/gallery/${order.id}`} className="hover:text-green-600 transition-colors">
-                                                <h2 className="text-xl font-bold text-slate-800">{order.itemName}</h2>
-                                            </Link>
-                                            <span className="text-xs font-mono text-slate-400">#{order.id.slice(-6)}</span>
-                                        </div>
-
-                                        <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                            {order.description}
-                                        </p>
-
-                                        <div className="flex flex-wrap gap-1.5 mt-auto mb-6">
-                                            {order.tags?.split(',').map((t) => (
-                                                <span key={t} className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                                                    {t.trim()}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
-                                                    {order.user.name?.[0] || 'U'}
+                                return (
+                                    <div key={order.id} className="card-outdoor flex flex-col h-full group hover:shadow-2xl transition-shadow relative">
+                                        {/* Preview (Image or 3D) - Link to Detail */}
+                                        <Link href={`/gallery/${order.id}`} className="block group cursor-pointer">
+                                            <div className="aspect-square relative flex items-center justify-center bg-slate-100 border-b border-slate-100 dark:border-slate-700 overflow-hidden">
+                                                <div className="w-full h-full transform transition-transform duration-700 group-hover:scale-105 relative">
+                                                    {mainImage ? (
+                                                        <Image
+                                                            src={mainImage}
+                                                            alt={order.itemName}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <BagModel
+                                                            width={order.width}
+                                                            height={order.height}
+                                                            depth={order.depth || 10}
+                                                            diameter={order.diameter || 15}
+                                                            shape={order.shape as 'SQUARE' | 'CYLINDER' | 'CUBE'}
+                                                            fabricColor="/assets/fabrics/mesh_green.jpeg"
+                                                            cordColor="#facc15"
+                                                            stopperColor="#000000"
+                                                        />
+                                                    )}
                                                 </div>
-                                                <span className="text-sm font-medium text-slate-700">{order.user.name}</span>
+                                                {!mainImage && (
+                                                    <div className="absolute top-4 right-4 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                        3D VIEW
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Link>
+
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <Link href={`/gallery/${order.id}`} className="hover:text-green-600 transition-colors">
+                                                    <h2 className="text-xl font-bold text-slate-800">{order.itemName}</h2>
+                                                </Link>
+                                                <span className="text-xs font-mono text-slate-400">#{order.id.slice(-6)}</span>
                                             </div>
 
-                                            <Link
-                                                href={`/customizer?ref=${order.id}`}
-                                                className="text-green-600 font-bold text-sm hover:underline flex items-center gap-1"
-                                            >
-                                                これで作る
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                </svg>
-                                            </Link>
+                                            <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                                                {order.description}
+                                            </p>
+
+                                            <div className="flex flex-wrap gap-1.5 mt-auto mb-6">
+                                                {order.tags?.split(',').map((t) => (
+                                                    <span key={t} className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                                                        {t.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
+                                                        {order.user.name?.[0] || 'U'}
+                                                    </div>
+                                                    <span className="text-sm font-medium text-slate-700">{order.user.name}</span>
+                                                </div>
+
+                                                <Link
+                                                    href={`/customizer?ref=${order.id}`}
+                                                    className="text-green-600 font-bold text-sm hover:underline flex items-center gap-1"
+                                                >
+                                                    これで作る
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </div>
