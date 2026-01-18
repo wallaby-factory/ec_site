@@ -1,9 +1,7 @@
 'use client'
 
 
-import Link from "next/link";
-import { getCurrentUser } from "@/actions/auth";
-import { LogoutButton } from "./LogoutButton";
+
 import Link from "next/link";
 import { getCurrentUser } from "@/actions/auth";
 import { LogoutButton } from "./LogoutButton";
