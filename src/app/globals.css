@@ -36,7 +36,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+
 }
 
 button {
@@ -70,8 +70,9 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-background: rgba(15, 23, 42, 0.2) !important;
-color: white;
+.dark .input-glass {
+  background: rgba(15, 23, 42, 0.2) !important;
+  color: white;
 }
 
 /* Custom Scrollbar */
