@@ -8,7 +8,7 @@ export async function uploadProductImages(orderId: string, formData: FormData) {
     const imagePaths: string[] = []
 
     // Get all files from formData
-    const files = formData.getAll('file') as File[]
+    const files = formData.getAll('images') as File[]
 
     if (!files || files.length === 0) {
         return { success: false, error: 'ファイルが選択されていません' }
