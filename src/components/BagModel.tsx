@@ -86,6 +86,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 cords: []
             }
 
+            const outlinesToAdd: { parent: THREE.Object3D, outline: THREE.Mesh }[] = []
+
             // Phase 1: Traverse to find meshes and apply materials
             clone.traverse((child: any) => {
                 if (child.isMesh) {
@@ -127,10 +129,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     })
 
                     // Add Outline (Inverted Hull Method)
-                    // We only add outline if it doesn't already have one (check children)
-                    // Since specific logic applies later, we need to be careful not to duplicate outlines if useMemo runs again
-                    // But traverse runs on a *clone*, so it's fresh every time.
-
+                    // Defer addition to avoid infinite recursion in traverse
                     const outlineMaterial = new THREE.MeshBasicMaterial({
                         color: 0x000000,
                         side: THREE.BackSide
@@ -139,11 +138,14 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     outlineMesh.scale.set(1.006, 1.006, 1.006) // Slight scale up for outline
                     outlineMesh.castShadow = false
                     outlineMesh.receiveShadow = false
-                    // Ensure the outline is rendered on top of the object if Z-fighting occurs?
-                    // BackSide usually handles it.
 
-                    child.add(outlineMesh)
+                    outlinesToAdd.push({ parent: child, outline: outlineMesh })
                 }
+            })
+
+            // Add collected outlines
+            outlinesToAdd.forEach(({ parent, outline }) => {
+                parent.add(outline)
             })
 
             // Phase 2: Measure Geometry and Apply Transformations
