@@ -145,8 +145,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // Apply to Hem: Fixed Height, Follows Top
                     if (meshes.hem_and_slot) {
                         const m = meshes.hem_and_slot
-                        // Keep Scale Fixed (1,1,1)
-                        m.scale.set(1, 1, 1)
+                        // X/Z scales (matches body), Y fixed (1)
+                        m.scale.set(scaleX, 1, scaleZ)
                         // X/Z scales radially (position.x * scaleX)
                         // Y moves up with the body top
                         m.position.set(
