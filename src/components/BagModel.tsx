@@ -118,21 +118,23 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                         {/* Stopper - ONLY if 1 cord */}
                         {cordCount === 1 && (
-                            <mesh position={[1.5, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                            <mesh position={[1.5, 1, 0]} rotation={[Math.PI / 2, 0, 0]}>
                                 <cylinderGeometry args={[0.8, 0.8, 2, 16]} />
-                                <meshStandardMaterial color={stopperColor} metalness={0.3} />
+                                <meshStandardMaterial color={stopperColor} metalness={0.3} roughness={0.4} />
                             </mesh>
                         )}
 
                         {/* Hanging Cords */}
-                        <mesh position={[1.5, -3, 0]}>
-                            <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
-                            <meshStandardMaterial color={cordColor} />
-                        </mesh>
-                        <mesh position={[1.5 + 0.4, -3, 0]}>
-                            <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
-                            <meshStandardMaterial color={cordColor} />
-                        </mesh>
+                        <group position={[cordCount === 1 ? 1.5 : 0.2, 0, 0]}>
+                            <mesh position={[-0.2, -3, 0]}>
+                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                                <meshStandardMaterial color={cordColor} />
+                            </mesh>
+                            <mesh position={[0.2, -3, 0]}>
+                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                                <meshStandardMaterial color={cordColor} />
+                            </mesh>
+                        </group>
                     </group>
 
                     {/* Left Cord - Only if 2 cords */}
@@ -144,15 +146,17 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                                 <meshStandardMaterial color={cordColor} />
                             </mesh>
 
-                            {/* Hanging Cords (No Stopper) */}
-                            <mesh position={[1.5, -3, 0]}>
-                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
-                                <meshStandardMaterial color={cordColor} />
-                            </mesh>
-                            <mesh position={[1.5 + 0.4, -3, 0]}>
-                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
-                                <meshStandardMaterial color={cordColor} />
-                            </mesh>
+                            {/* Hanging Cords (No Stopper in 2-cord version as per user instruction) */}
+                            <group position={[0.2, 0, 0]}>
+                                <mesh position={[-0.2, -3, 0]}>
+                                    <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                                    <meshStandardMaterial color={cordColor} />
+                                </mesh>
+                                <mesh position={[0.2, -3, 0]}>
+                                    <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                                    <meshStandardMaterial color={cordColor} />
+                                </mesh>
+                            </group>
                         </group>
                     )}
                 </group>
