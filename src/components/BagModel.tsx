@@ -101,32 +101,24 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
-                    // Categorize meshes
-                    if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) { // Stopper parts
-                        // Note: names might be like "1cord_stopper_button_left"
+                    // Categorize meshes and determine color
+                    if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
+                        // Stopper Handling (Base vs Button)
+                        const isBase = lowerName.includes('base')
 
-                        let isBase = lowerName.includes('base')
-                        let isButton = lowerName.includes('button')
+                        // Default to the selected color (this covers the Button case)
+                        color = stopperColor
 
-                        // If checking names like "1cord_stopper..." it's safer to ensure it IS a stopper part if it contains stopper
-                        // But user said "1cord_stopper_button_left".
-                        // Wait, did user say "1cord_cord_left"? yes.
-
-                        // Determine Stopper Color
-                        if (stopperColor === 'ホワイト' || stopperColor === 'ブラック') {
-                            color = stopperColor
-                        } else {
-                            if (isBase) color = 'ホワイト'
-                            else if (isButton) color = stopperColor
-                            else color = stopperColor // Default if neither detected but is stopper
+                        // Override for Base
+                        if (isBase) {
+                            // Base is Black only if Black is selected. Otherwise (White or Colors), Base is White.
+                            color = (stopperColor === 'ブラック') ? 'ブラック' : 'ホワイト'
                         }
 
                         roughness = 0.3
                         metalness = 0.4
 
-                        // Add to cords list for positioning because they move together?
-                        // User said: "Body size changes -> these adjust top/bottom/left/right positions".
-                        // So yes, treat as accessory.
+                        // Add to cords list for positioning to follow body expansion
                         meshes.cords.push(child)
                     }
                     else if (lowerName.includes('cord') || lowerName.includes('rope')) {
