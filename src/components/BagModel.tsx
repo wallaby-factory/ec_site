@@ -81,28 +81,35 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
-                    // Heuristic for Cord
-                    // Matches "cord", "rope", "himo", "curve", "line", "musubi" (knot)
-                    if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve') || lowerName.includes('line') || lowerName.includes('musubi')) {
-                        color = cordColor
-
-                        // Prevent vertical stretching of the cord thickness
-                        // But allow X/Z to follow bag width slightly? 
-                        // Actually, user said keep thickness constant.
-                        if (scaleY !== 1) child.scale.y = 1 / scaleY
-                        if (scaleX !== 1) child.scale.x = 1 / scaleX
-                        if (scaleZ !== 1) child.scale.z = 1 / scaleZ
-
-                    }
-                    // Heuristic for Stopper
-                    else if (lowerName.includes('stopper') || lowerName.includes('fastener') || lowerName.includes('parts')) {
+                    // Check stopper FIRST (before cord) to avoid "code_stopper" matching "cord"
+                    if (lowerName.includes('stopper') || lowerName.includes('fastener') || lowerName.includes('parts')) {
                         color = stopperColor
                         roughness = 0.3
                         metalness = 0.4
 
-                        // Inverse Scale to keep Stopper constant size relative to world
+                        // Keep stopper SIZE constant (inverse scale)
+                        // Position will naturally follow bag scaling
                         if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
                             child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        }
+                    }
+                    // Cord (including knots)
+                    else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve') || lowerName.includes('line') || lowerName.includes('musubi')) {
+                        color = cordColor
+
+                        // Keep cord SIZE (thickness) constant
+                        // Position will naturally follow bag scaling
+                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
+                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        }
+                    }
+                    // Hem and Slit - keep fixed height (4cm total = 2cm hem + 2cm slit)
+                    else if (lowerName.includes('hem') || lowerName.includes('slit') || lowerName.includes('top')) {
+                        color = fabricColor
+
+                        // Keep hem/slit Y-size constant (inverse Y-scale only)
+                        if (scaleY !== 1) {
+                            child.scale.y = 1 / scaleY
                         }
                     }
 
