@@ -52,15 +52,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         )
     } else {
         // SQUARE (Flat) or CUBE
-        // For Square, depth is effectively small (e.g. 1.0 or user input if expanded later, but user said 'Flat' vs 'Cube')
-        // Current 'Square' implementation was actually a thin box.
-        // If Cube, use provided depth. If Square, use existing logic (pouchDepth=1.0).
-        const actualDepth = shape === 'CUBE' ? depth : 1.5
+        const actualDepth = shape === 'CUBE' ? depth : 2.5 // Increased depth for puffiness
 
         mainGeometry = (
             <RoundedBox
                 args={[width, height - hemHeight, actualDepth]}
-                radius={shape === 'CUBE' ? 2 : 0.8}
+                radius={shape === 'CUBE' ? 2 : 1.2} // Increased radius for softer look
                 smoothness={4}
                 position={[0, mainBodyY, 0]}
                 castShadow
@@ -72,8 +69,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
         hemGeometry = (
             <RoundedBox
-                args={[width + 0.4, hemHeight, actualDepth + 0.3]} // Hem slightly larger
-                radius={0.5}
+                args={[width - 0.5, hemHeight, actualDepth + 0.8]} // Hem slightly cinched and deeper
+                radius={hemHeight / 2}
                 smoothness={4}
                 position={[0, hemY, 0]}
             >
@@ -82,12 +79,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         )
     }
 
-    // Cord positioning (Simplified: always on right side, adjusted for width/radius)
+    // Cord positioning - Move inward to originate from inside the hem
     let cordX = 0
     if (shape === 'CYLINDER') {
-        cordX = (diameter / 2) + 0.5
+        cordX = (diameter / 2)
     } else {
-        cordX = (width / 2) + 0.5
+        cordX = (width / 2) - 0.5
     }
 
     return (
@@ -105,55 +102,54 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 {/* Top Hem */}
                 {hemGeometry}
 
-                {/* Cord & Stopper (Attached to Hem) */}
-                {/* Cord & Stopper (Attached to Hem) */}
+                {/* Cord & Stopper */}
                 <group position={[0, hemY, 0]}>
-                    {/* Right Cord */}
+                    {/* Right Side Cord */}
                     <group position={[cordX, 0, 0]}>
-                        {/* Cord Loop representation */}
-                        <mesh position={[0, 1, 0]} rotation={[0, 0, Math.PI / 2]}>
+                        {/* Cord Loop - Horizontal part inside hem */}
+                        <mesh position={[-1.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                             <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
                             <meshStandardMaterial color={cordColor} />
                         </mesh>
 
-                        {/* Stopper - ONLY if 1 cord */}
+                        {/* Stopper - Properly oriented and positioned */}
                         {cordCount === 1 && (
-                            <mesh position={[1.5, 1, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                                <cylinderGeometry args={[0.8, 0.8, 2, 16]} />
-                                <meshStandardMaterial color={stopperColor} metalness={0.3} roughness={0.4} />
+                            <mesh position={[1.0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                                <cylinderGeometry args={[1.0, 1.0, 2.0, 16]} />
+                                <meshStandardMaterial color={stopperColor} metalness={0.6} roughness={0.3} />
                             </mesh>
                         )}
 
                         {/* Hanging Cords */}
-                        <group position={[cordCount === 1 ? 1.5 : 0.2, 0, 0]}>
-                            <mesh position={[-0.2, -3, 0]}>
-                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                        <group position={[cordCount === 1 ? 2.5 : 0.5, 0, 0]}>
+                            <mesh position={[-0.3, -3, 0]}>
+                                <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
                                 <meshStandardMaterial color={cordColor} />
                             </mesh>
-                            <mesh position={[0.2, -3, 0]}>
-                                <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                            <mesh position={[0.3, -3, 0]}>
+                                <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
                                 <meshStandardMaterial color={cordColor} />
                             </mesh>
                         </group>
                     </group>
 
-                    {/* Left Cord - Only if 2 cords */}
+                    {/* Left Side Cord - Only if 2 cords */}
                     {cordCount === 2 && (
                         <group position={[-cordX, 0, 0]} rotation={[0, Math.PI, 0]}>
-                            {/* Cord Loop representation */}
-                            <mesh position={[0, 1, 0]} rotation={[0, 0, Math.PI / 2]}>
+                            {/* Cord Loop */}
+                            <mesh position={[-1.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                                 <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
                                 <meshStandardMaterial color={cordColor} />
                             </mesh>
 
-                            {/* Hanging Cords (No Stopper in 2-cord version as per user instruction) */}
-                            <group position={[0.2, 0, 0]}>
-                                <mesh position={[-0.2, -3, 0]}>
-                                    <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                            {/* Hanging Cords */}
+                            <group position={[0.5, 0, 0]}>
+                                <mesh position={[-0.3, -3, 0]}>
+                                    <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
                                     <meshStandardMaterial color={cordColor} />
                                 </mesh>
-                                <mesh position={[0.2, -3, 0]}>
-                                    <cylinderGeometry args={[0.15, 0.15, 6, 8]} />
+                                <mesh position={[0.3, -3, 0]}>
+                                    <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
                                     <meshStandardMaterial color={cordColor} />
                                 </mesh>
                             </group>
