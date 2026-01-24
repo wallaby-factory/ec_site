@@ -22,13 +22,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping
     grassTexture.repeat.set(4, 4)
 
-    // Load FBX models
-    const fbx1Cord = useFBX('/models/1code_平型.fbx')
-    const fbx2Cord = useFBX('/models/2code_平型.fbx')
+    // Load FBX models - Updated to new version 4
+    const fbx1Cord = useFBX('/models/1code_平型4.fbx')
+    const fbx2Cord = useFBX('/models/2code_平型4.fbx')
 
     // Constants
     const scale = 0.04
-    const hemHeight = 3
+    const hemHeight = 1 // Fixed hem height 1cm as requested
     const totalHeight = height * scale
     const floorY = -(totalHeight / 2) - 0.005
 
@@ -79,11 +79,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
             // Map to hold references for second pass
             const meshes: {
                 body?: THREE.Mesh,
-                hem_and_slot?: THREE.Mesh,
-                stopper?: THREE.Mesh,
+                hem?: THREE.Mesh,
+                stopper?: { base?: THREE.Mesh, button?: THREE.Mesh }[],
                 cords: THREE.Mesh[]
             } = {
-                cords: []
+                cords: [],
+                stopper: []
             }
 
             const outlinesToAdd: { parent: THREE.Object3D, outline: THREE.Mesh }[] = []
@@ -101,19 +102,40 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
                     // Categorize meshes
-                    if (lowerName.includes('stopper') || lowerName.includes('fastener')) {
-                        color = stopperColor
+                    if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) { // Stopper parts
+                        // Note: names might be like "1cord_stopper_button_left"
+
+                        let isBase = lowerName.includes('base')
+                        let isButton = lowerName.includes('button')
+
+                        // If checking names like "1cord_stopper..." it's safer to ensure it IS a stopper part if it contains stopper
+                        // But user said "1cord_stopper_button_left".
+                        // Wait, did user say "1cord_cord_left"? yes.
+
+                        // Determine Stopper Color
+                        if (stopperColor === 'ホワイト' || stopperColor === 'ブラック') {
+                            color = stopperColor
+                        } else {
+                            if (isBase) color = 'ホワイト'
+                            else if (isButton) color = stopperColor
+                            else color = stopperColor // Default if neither detected but is stopper
+                        }
+
                         roughness = 0.3
                         metalness = 0.4
-                        meshes.stopper = child
+
+                        // Add to cords list for positioning because they move together?
+                        // User said: "Body size changes -> these adjust top/bottom/left/right positions".
+                        // So yes, treat as accessory.
+                        meshes.cords.push(child)
                     }
-                    else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('terminal') || lowerName.includes('middle') || lowerName.includes('turn') || lowerName.includes('knot')) {
+                    else if (lowerName.includes('cord') || lowerName.includes('rope')) {
                         color = cordColor
                         meshes.cords.push(child)
                     }
-                    else if (lowerName.includes('hem_and_slot')) {
+                    else if (lowerName.includes('hem_and_slit')) {
                         color = fabricColor
-                        meshes.hem_and_slot = child
+                        meshes.hem = child
                     }
                     else if (lowerName.includes('body')) {
                         color = fabricColor
@@ -129,13 +151,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     })
 
                     // Add Outline (Inverted Hull Method)
-                    // Defer addition to avoid infinite recursion in traverse
                     const outlineMaterial = new THREE.MeshBasicMaterial({
                         color: 0x000000,
                         side: THREE.BackSide
                     })
                     const outlineMesh = new THREE.Mesh(child.geometry, outlineMaterial)
-                    outlineMesh.scale.set(1.006, 1.006, 1.006) // Slight scale up for outline
+                    outlineMesh.scale.set(1.006, 1.006, 1.006)
                     outlineMesh.castShadow = false
                     outlineMesh.receiveShadow = false
 
@@ -168,10 +189,6 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
 
                     // --- Horizontal Movement Logic (Force Push Outward) ---
-                    // Calculate absolute expansion amount (per side)
-                    // New Width = BodyWidth * scaleX
-                    // Total Expansion = New Width - BodyWidth
-                    // Expansion Per Side = Total Expansion / 2
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
                     console.log('EXPANSION:', { total: expansionPerSide * 2, perSide: expansionPerSide })
@@ -180,8 +197,14 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
 
                     // Apply to Hem: Fixed Height, Follows Top, Scales Width
-                    if (meshes.hem_and_slot) {
-                        const m = meshes.hem_and_slot
+                    if (meshes.hem) {
+                        const m = meshes.hem
+                        // Force Height to always be 1 unit (scaleY = 1 / originalHeight?) 
+                        // Wait, if original model hem is 1cm, and we scaled the Group by 0.04...
+                        // Actually, we are scaling the Mesh. 
+                        // If we want fixed height, we just set scaleY = 1.
+                        // And we move it to follow the body top.
+
                         m.scale.set(scaleX, 1, scaleZ)
                         m.position.set(
                             m.position.x * scaleX,
@@ -225,12 +248,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         })
                     }
 
-                    // Apply to Stopper
-                    if (meshes.stopper) {
-                        updateAccessoryPosition(meshes.stopper)
-                    }
-
-                    // Apply to Cords
+                    // Apply to Cords & Stoppers
                     meshes.cords.forEach(m => {
                         updateAccessoryPosition(m)
                     })
@@ -275,7 +293,7 @@ export default function BagModelContainer(props: BagModelProps) {
     return (
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
-                {/* Adjusted camera to Z=1.3 for even closer zoom */}
+                {/* Adjusted camera to Z=0.85 for very close zoom */}
                 <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
