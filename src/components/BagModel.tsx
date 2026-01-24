@@ -107,8 +107,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         // User specified: stopper2 is base
                         const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
 
-                        // Default to the selected color (this covers the Button/stopper1 case)
-                        color = stopperColor
+                        // Default to the selected color, but for Black selection, Button becomes White
+                        color = (stopperColor === 'ブラック') ? 'ホワイト' : stopperColor
 
                         // Override for Base
                         if (isBase) {
