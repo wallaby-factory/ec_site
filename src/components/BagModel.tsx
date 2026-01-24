@@ -88,16 +88,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     child.receiveShadow = true
 
                     let color = fabricColor
-                    let roughness = 0.6
-                    let metalness = 0.0
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
                     // Categorize meshes
                     if (lowerName.includes('stopper') || lowerName.includes('fastener')) {
                         color = stopperColor
-                        roughness = 0.3
-                        metalness = 0.4
                         meshes.stopper = child
                     }
                     else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('terminal') || lowerName.includes('middle') || lowerName.includes('turn') || lowerName.includes('knot')) {
@@ -113,10 +109,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         meshes.body = child
                     }
 
-                    child.material = new THREE.MeshStandardMaterial({
+                    // Use MeshToonMaterial for anime/cartoon look
+                    child.material = new THREE.MeshToonMaterial({
                         color: color,
-                        roughness: roughness,
-                        metalness: metalness,
                         side: THREE.DoubleSide
                     })
                 }
@@ -170,10 +165,6 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         let posX = m.position.x
 
                         // Strict Directional Force Logic
-                        // "Left" mesh = Move MORE Left (Negative X)
-                        // "Right" mesh = Move MORE Right (Positive X)
-                        // This preserves distance from the expanding edge.
-
                         if (lowerName.includes('_left') || lowerName.includes('left')) {
                             // Assuming Left is Negative X direction
                             posX = m.position.x - expansionPerSide
@@ -251,7 +242,8 @@ export default function BagModelContainer(props: BagModelProps) {
     return (
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
-                <PerspectiveCamera makeDefault position={[0, 0.5, 3]} fov={50} />
+                {/* Adjusted camera Z to 1.8 for closer initial zoom */}
+                <PerspectiveCamera makeDefault position={[0, 0.5, 1.8]} fov={50} />
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
                 <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
