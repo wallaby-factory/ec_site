@@ -81,6 +81,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
+                    // DEBUG: Log ALL mesh names
+                    console.log('MESH FOUND:', child.name, 'lower:', lowerName)
+
                     // body: Scale normally in all directions
                     if (lowerName.includes('body')) {
                         color = fabricColor
