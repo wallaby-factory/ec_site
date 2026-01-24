@@ -61,12 +61,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         // SQUARE (Flat) / CUBE - Use FBX
         const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
 
-        // Scale Calculation: Base model is 10x10cm
+        // Scale Calculation: Base model is 10x10cm body + 4cm hem/slit
         const scaleX = width / 10
         const scaleY = height / 10
         const scaleZ = shape === 'CUBE' ? depth / 10 : (depth > 0 ? depth / 10 : 1.5)
 
-        // Clone and apply materials
+        // Clone and apply individual scale/position per mesh
         const scene = useMemo(() => {
             const clone = fbx.clone()
 
@@ -81,22 +81,30 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
-                    // hem_and_slit: Height stays fixed, position follows scaling
-                    if (lowerName.includes('hem_and_slit')) {
+                    // body: Scale normally in all directions
+                    if (lowerName.includes('body')) {
                         color = fabricColor
-                        // Divide Y-scale to counteract parent scaling (preserves original mesh scale)
-                        child.scale.y = child.scale.y / scaleY
+                        child.scale.set(scaleX, scaleY, scaleZ)
                     }
-                    // Stopper (only in 1-cord model)
+                    // hem_and_slit: Width/depth scale with body, height stays fixed
+                    // Position moves up as body gets taller
+                    else if (lowerName.includes('hem_and_slit')) {
+                        color = fabricColor
+                        child.scale.set(scaleX, 1, scaleZ)  // Y stays at 1 (no height change)
+                        child.position.y = child.position.y * scaleY  // Position follows body top
+                    }
+                    // Stopper: Size stays constant, position follows scaling
                     else if (lowerName.includes('stopper')) {
                         color = stopperColor
                         roughness = 0.3
                         metalness = 0.4
-                        // Keep size constant by dividing original scale (position follows scaling)
-                        child.scale.set(
-                            child.scale.x / scaleX,
-                            child.scale.y / scaleY,
-                            child.scale.z / scaleZ
+                        // Size stays constant (scale = 1,1,1)
+                        child.scale.set(1, 1, 1)
+                        // Position follows bag dimensions
+                        child.position.set(
+                            child.position.x * scaleX,
+                            child.position.y * scaleY,
+                            child.position.z * scaleZ
                         )
                     }
                     // Cord parts: terminal, middle, turn, knot
@@ -105,17 +113,14 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         lowerName.includes('turn') ||
                         lowerName.includes('knot')) {
                         color = cordColor
-                        // Keep size constant by dividing original scale (position follows scaling)
-                        child.scale.set(
-                            child.scale.x / scaleX,
-                            child.scale.y / scaleY,
-                            child.scale.z / scaleZ
+                        // Size stays constant (scale = 1,1,1)
+                        child.scale.set(1, 1, 1)
+                        // Position follows bag dimensions
+                        child.position.set(
+                            child.position.x * scaleX,
+                            child.position.y * scaleY,
+                            child.position.z * scaleZ
                         )
-                    }
-                    // body: Normal scaling (no special treatment)
-                    else if (lowerName.includes('body')) {
-                        color = fabricColor
-                        // No scale adjustment - scales normally with bag
                     }
 
                     child.material = new THREE.MeshStandardMaterial({
@@ -132,7 +137,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         content = (
             <primitive
                 object={scene}
-                scale={[scaleX, scaleY, scaleZ]}
+                scale={[1, 1, 1]}  // No parent scaling - handled per mesh
                 position={[0, 0, 0]}
                 rotation={[0, -Math.PI / 2, 0]} // Rotate 90 degrees
             />
