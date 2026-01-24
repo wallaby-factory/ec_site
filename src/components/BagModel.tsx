@@ -251,7 +251,7 @@ export default function BagModelContainer(props: BagModelProps) {
     return (
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
-                <PerspectiveCamera makeDefault position={[0, 1, 5]} fov={50} />
+                <PerspectiveCamera makeDefault position={[0, 0.5, 3]} fov={50} />
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
                 <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
