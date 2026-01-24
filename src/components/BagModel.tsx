@@ -30,7 +30,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
     const scale = 0.04
     const hemHeight = 3
     const totalHeight = height * scale
-    const floorY = -(totalHeight / 2) - 0.05
+    const floorY = -(totalHeight / 2) - 0.005
 
     // Position adjustments for Cylinder
     const mainBodyY = -hemHeight / 2
@@ -260,7 +260,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 <meshStandardMaterial map={grassTexture} roughness={1} />
             </mesh>
 
-            <ContactShadows position={[0, floorY + 0.01, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
+            <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
 
             <group scale={scale}>
                 <group position={[0, 0, 0]}>
@@ -276,7 +276,7 @@ export default function BagModelContainer(props: BagModelProps) {
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
                 {/* Adjusted camera to Z=1.3 for even closer zoom */}
-                <PerspectiveCamera makeDefault position={[0, 0.5, 1.3]} fov={50} />
+                <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
                 <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
