@@ -89,9 +89,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         color = fabricColor
                         child.scale.set(scaleX, scaleY, scaleZ)
                     }
-                    // hem_and_slit: Width/depth scale with body, height stays fixed
+                    // hem_and_slot: Width/depth scale with body, height stays fixed
                     // Position moves up as body gets taller
-                    else if (lowerName.includes('hem_and_slit')) {
+                    else if (lowerName.includes('hem_and_slot')) {
                         color = fabricColor
                         // DEBUG: Log original values
                         console.log('hem_and_slit BEFORE:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
