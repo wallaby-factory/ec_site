@@ -115,6 +115,14 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                             color = (stopperColor === 'ブラック') ? 'ブラック' : 'ホワイト'
                         }
 
+                        console.log(`[BagModel] Stopper Mesh Found:`, {
+                            name: child.name,
+                            lowerName,
+                            isBase,
+                            selectedStopperColor: stopperColor,
+                            assignedColor: color
+                        })
+
                         roughness = 0.3
                         metalness = 0.4
 
