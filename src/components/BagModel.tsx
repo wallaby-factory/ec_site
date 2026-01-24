@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useFBX } from '@react-three/drei'
 import * as THREE from 'three'
@@ -17,7 +17,7 @@ interface BagModelProps {
     cordCount?: 1 | 2
 }
 
-function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1, setDebugNames }: BagModelProps & { setDebugNames: (names: string[]) => void }) {
+function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1 }: BagModelProps) {
     const grassTexture = useLoader(THREE.TextureLoader, '/assets/textures/shibafu.jpg')
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping
     grassTexture.repeat.set(4, 4)
@@ -38,7 +38,6 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
     let content = null
 
     if (shape === 'CYLINDER') {
-        // ... Cylinder Logic (Unchanged) ...
         const radius = diameter / 2
         content = (
             <group>
@@ -70,31 +69,30 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         // Clone and apply materials
         const scene = useMemo(() => {
             const clone = fbx.clone()
-            const foundNames: string[] = []
 
             clone.traverse((child: any) => {
-                if (child.isMesh || child.isGroup) {
-                    if (child.name) foundNames.push(child.name)
-                }
-
                 if (child.isMesh) {
                     child.castShadow = true
                     child.receiveShadow = true
 
-                    const lowerName = child.name ? child.name.toLowerCase() : ''
                     let color = fabricColor
                     let roughness = 0.6
                     let metalness = 0.0
 
-                    // Reset scale to avoid accumulating transformations if re-used
-                    // (Though clone should be fresh)
+                    const lowerName = child.name ? child.name.toLowerCase() : ''
 
                     // Heuristic for Cord
-                    if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve') || lowerName.includes('line')) {
+                    // Matches "cord", "rope", "himo", "curve", "line", "musubi" (knot)
+                    if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve') || lowerName.includes('line') || lowerName.includes('musubi')) {
                         color = cordColor
-                        // Counter-scale Y to prevent thickening vertically when bag gets tall
-                        // We can't easily prevent X/Z stretching (fitting the bag)
+
+                        // Prevent vertical stretching of the cord thickness
+                        // But allow X/Z to follow bag width slightly? 
+                        // Actually, user said keep thickness constant.
                         if (scaleY !== 1) child.scale.y = 1 / scaleY
+                        if (scaleX !== 1) child.scale.x = 1 / scaleX
+                        if (scaleZ !== 1) child.scale.z = 1 / scaleZ
+
                     }
                     // Heuristic for Stopper
                     else if (lowerName.includes('stopper') || lowerName.includes('fastener') || lowerName.includes('parts')) {
@@ -102,8 +100,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         roughness = 0.3
                         metalness = 0.4
 
-                        // Inverse Scale to keep Stopper constant size
-                        child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        // Inverse Scale to keep Stopper constant size relative to world
+                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
+                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        }
                     }
 
                     child.material = new THREE.MeshStandardMaterial({
@@ -114,10 +114,6 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     })
                 }
             })
-
-            // Send names to parent for debug display
-            setDebugNames(foundNames)
-
             return clone
         }, [fbx, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
 
@@ -126,7 +122,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 object={scene}
                 scale={[scaleX, scaleY, scaleZ]}
                 position={[0, 0, 0]}
-                rotation={[0, -Math.PI / 2, 0]} // Rotate 90 degrees as requested
+                rotation={[0, -Math.PI / 2, 0]} // Rotate 90 degrees
             />
         )
     }
@@ -149,8 +145,6 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 }
 
 export default function BagModelContainer(props: BagModelProps) {
-    const [debugNames, setDebugNames] = useState<string[]>([])
-
     return (
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
@@ -160,7 +154,7 @@ export default function BagModelContainer(props: BagModelProps) {
                 <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
 
                 <React.Suspense fallback={null}>
-                    <Bag {...props} setDebugNames={setDebugNames} />
+                    <Bag {...props} />
                     <ContactShadows position={[0, -2, 0]} opacity={0.6} scale={10} blur={2} far={4} />
                     <Environment preset="park" />
                 </React.Suspense>
@@ -177,20 +171,6 @@ export default function BagModelContainer(props: BagModelProps) {
             {/* Hint Overlay */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
                 Drag to rotate • Scroll to zoom
-            </div>
-
-            {/* Debug Overlay for Mesh Names - To be removed later */}
-            <div className="absolute top-2 left-2 bg-white/80 p-2 text-xs text-black pointer-events-none rounded max-h-[200px] overflow-auto">
-                <p className="font-bold border-b border-gray-300 mb-1">Detected Meshes:</p>
-                {debugNames.length > 0 ? (
-                    <ul className="list-disc pl-3">
-                        {debugNames.map((name, i) => (
-                            <li key={i}>{name}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>Scanning...</p>
-                )}
             </div>
         </div>
     )
