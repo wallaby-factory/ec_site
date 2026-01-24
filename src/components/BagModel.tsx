@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useRef, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, RoundedBox } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useFBX } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface BagModelProps {
@@ -22,69 +22,104 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping
     grassTexture.repeat.set(4, 4)
 
+    // Load FBX models
+    const fbx1Cord = useFBX('/models/1code_平型.fbx')
+    const fbx2Cord = useFBX('/models/2code_平型.fbx')
+
     const scale = 0.04
     const hemHeight = 3
-    // Calculate total height for floor positioning (approximate)
     const totalHeight = height * scale
     const floorY = -(totalHeight / 2) - 0.05
 
-    // Logic for geometry args
-    // Default to Flat/Square params
-    let mainGeometry = null
-    let hemGeometry = null
     // Position adjustments
-    const mainBodyY = -hemHeight / 2 // Center of main body relative to group
+    const mainBodyY = -hemHeight / 2
     const hemY = (height / 2) - (hemHeight / 2)
+
+    let content = null
 
     if (shape === 'CYLINDER') {
         const radius = diameter / 2
-        mainGeometry = (
-            <mesh position={[0, mainBodyY, 0]} castShadow receiveShadow>
-                <cylinderGeometry args={[radius, radius, height - hemHeight, 32]} />
-                <meshStandardMaterial color={fabricColor} roughness={0.7} metalness={0.1} />
-            </mesh>
-        )
-        hemGeometry = (
-            <mesh position={[0, hemY, 0]}>
-                <cylinderGeometry args={[radius + 0.2, radius + 0.2, hemHeight, 32]} />
-                <meshStandardMaterial color={fabricColor} roughness={0.7} />
-            </mesh>
+        content = (
+            <group>
+                <mesh position={[0, mainBodyY, 0]} castShadow receiveShadow>
+                    <cylinderGeometry args={[radius, radius, height - hemHeight, 32]} />
+                    <meshStandardMaterial color={fabricColor} roughness={0.7} metalness={0.1} />
+                </mesh>
+                <mesh position={[0, hemY, 0]}>
+                    <cylinderGeometry args={[radius + 0.2, radius + 0.2, hemHeight, 32]} />
+                    <meshStandardMaterial color={fabricColor} roughness={0.7} />
+                </mesh>
+                {/* Simplified Cord for Cylinder (Procedural fallback) */}
+                <group position={[0, hemY, 0]}>
+                    <mesh position={[radius + 0.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                        <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
+                        <meshStandardMaterial color={cordColor} />
+                    </mesh>
+                </group>
+            </group>
         )
     } else {
-        // SQUARE (Flat) or CUBE
-        const actualDepth = shape === 'CUBE' ? depth : 2.5 // Increased depth for puffiness
+        // SQUARE (Flat) / CUBE - Use FBX
+        const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
 
-        mainGeometry = (
-            <RoundedBox
-                args={[width, height - hemHeight, actualDepth]}
-                radius={shape === 'CUBE' ? 2 : 1.2} // Increased radius for softer look
-                smoothness={4}
-                position={[0, mainBodyY, 0]}
-                castShadow
-                receiveShadow
-            >
-                <meshStandardMaterial color={fabricColor} roughness={0.7} metalness={0.1} />
-            </RoundedBox>
+        // Clone and apply materials
+        const scene = useMemo(() => {
+            const clone = fbx.clone()
+            clone.traverse((child: any) => {
+                if (child.isMesh) {
+                    child.castShadow = true
+                    child.receiveShadow = true
+
+                    // Simple material logic based on names
+                    // Console log to help debug mesh names if needed
+                    // console.log('Mesh Name:', child.name)
+
+                    let color = fabricColor
+                    let roughness = 0.6
+                    let metalness = 0.0
+
+                    const lowerName = child.name ? child.name.toLowerCase() : ''
+
+                    // Heuristic for Cord
+                    // Matches "cord", "rope", "himo", "string", "curve"
+                    if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve')) {
+                        color = cordColor
+                    }
+                    // Heuristic for Stopper
+                    // Matches "stopper", "fastener", "plastic"
+                    else if (lowerName.includes('stopper') || lowerName.includes('fastener')) {
+                        color = stopperColor
+                        roughness = 0.3
+                        metalness = 0.4
+                    }
+
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: color,
+                        roughness: roughness,
+                        metalness: metalness,
+                        side: THREE.DoubleSide
+                    })
+                }
+            })
+            return clone
+        }, [fbx, fabricColor, cordColor, stopperColor])
+
+        // Scale Calculation: Base model is 10x10cm
+        const scaleX = width / 10
+        const scaleY = height / 10
+        // For flat bag, depth scaling might need adjusting if model has own depth
+        const scaleZ = shape === 'CUBE' ? depth / 10 : (depth > 0 ? depth / 10 : 1.5)
+
+        // Center adjustment: The base model might need internal offset
+        // Assuming 10cm model center is at (0,0,0) or (0,5,0)
+        // With scale, we align bottom to 0 relative to parent group
+        content = (
+            <primitive
+                object={scene}
+                scale={[scaleX, scaleY, scaleZ]}
+                position={[0, 0, 0]} // Adjust locally if needed
+            />
         )
-
-        hemGeometry = (
-            <RoundedBox
-                args={[width - 0.5, hemHeight, actualDepth + 0.8]} // Hem slightly cinched and deeper
-                radius={hemHeight / 2}
-                smoothness={4}
-                position={[0, hemY, 0]}
-            >
-                <meshStandardMaterial color={fabricColor} roughness={0.7} />
-            </RoundedBox>
-        )
-    }
-
-    // Cord positioning - Move inward to originate from inside the hem
-    let cordX = 0
-    if (shape === 'CYLINDER') {
-        cordX = (diameter / 2)
-    } else {
-        cordX = (width / 2) - 0.5
     }
 
     return (
@@ -96,65 +131,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
             </mesh>
 
             <group scale={scale}>
-                {/* Main Body */}
-                {mainGeometry}
-
-                {/* Top Hem */}
-                {hemGeometry}
-
-                {/* Cord & Stopper */}
-                <group position={[0, hemY, 0]}>
-                    {/* Right Side Cord */}
-                    <group position={[cordX, 0, 0]}>
-                        {/* Cord Loop - Horizontal part inside hem */}
-                        <mesh position={[-1.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                            <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
-                            <meshStandardMaterial color={cordColor} />
-                        </mesh>
-
-                        {/* Stopper - Properly oriented and positioned */}
-                        {cordCount === 1 && (
-                            <mesh position={[1.0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                                <cylinderGeometry args={[1.0, 1.0, 2.0, 16]} />
-                                <meshStandardMaterial color={stopperColor} metalness={0.6} roughness={0.3} />
-                            </mesh>
-                        )}
-
-                        {/* Hanging Cords */}
-                        <group position={[cordCount === 1 ? 2.5 : 0.5, 0, 0]}>
-                            <mesh position={[-0.3, -3, 0]}>
-                                <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
-                                <meshStandardMaterial color={cordColor} />
-                            </mesh>
-                            <mesh position={[0.3, -3, 0]}>
-                                <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
-                                <meshStandardMaterial color={cordColor} />
-                            </mesh>
-                        </group>
-                    </group>
-
-                    {/* Left Side Cord - Only if 2 cords */}
-                    {cordCount === 2 && (
-                        <group position={[-cordX, 0, 0]} rotation={[0, Math.PI, 0]}>
-                            {/* Cord Loop */}
-                            <mesh position={[-1.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                                <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
-                                <meshStandardMaterial color={cordColor} />
-                            </mesh>
-
-                            {/* Hanging Cords */}
-                            <group position={[0.5, 0, 0]}>
-                                <mesh position={[-0.3, -3, 0]}>
-                                    <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
-                                    <meshStandardMaterial color={cordColor} />
-                                </mesh>
-                                <mesh position={[0.3, -3, 0]}>
-                                    <cylinderGeometry args={[0.2, 0.2, 8, 8]} />
-                                    <meshStandardMaterial color={cordColor} />
-                                </mesh>
-                            </group>
-                        </group>
-                    )}
+                {/* Adjust group position to sit on floor */}
+                <group position={[0, 0, 0]}>
+                    {content}
                 </group>
             </group>
         </group>
@@ -187,7 +166,7 @@ export default function BagModelContainer(props: BagModelProps) {
 
             {/* Hint Overlay */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
-                Drag to rotate • Scroll to zoom
+                Drag to rotate • Scroll to zoom (Updated)
             </div>
         </div>
     )
