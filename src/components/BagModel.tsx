@@ -133,17 +133,22 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (bbox) {
                     const originalBodyTop = bbox.max.y
 
+                    // Measure Body Width
+                    const bodyWidth = bbox.max.x - bbox.min.x
+
+                    console.log('BODY GEOMETRY:', { width: bodyWidth, minX: bbox.min.x, maxX: bbox.max.x })
+
                     // --- Vertical Movement Logic ---
-                    // Calculate how much the top edge moves up
                     const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
 
-                    // --- Horizontal Movement Logic ---
-                    // Original body width is 10cm, so edge is at +/- 5
-                    // New width is different, so edge moves by (newWidth - 10) / 2
-                    // Since width = scaleX * 10
-                    // Movement = (scaleX * 10 - 10) / 2 = 5 * (scaleX - 1)
-                    const bodyWidthMovement = 5 * (scaleX - 1)
+                    // --- Horizontal Movement Logic (Force Push Outward) ---
+                    // Calculate absolute expansion amount (per side)
+                    // New Width = BodyWidth * scaleX
+                    // Total Expansion = New Width - BodyWidth
+                    // Expansion Per Side = Total Expansion / 2
+                    const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
+                    console.log('EXPANSION:', { total: expansionPerSide * 2, perSide: expansionPerSide })
 
                     // Apply to Body: Standard Scaling
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
@@ -151,10 +156,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // Apply to Hem: Fixed Height, Follows Top, Scales Width
                     if (meshes.hem_and_slot) {
                         const m = meshes.hem_and_slot
-                        // X/Z scales (matches body), Y fixed (1)
                         m.scale.set(scaleX, 1, scaleZ)
-                        // X position scales linearly (center pivot assumed ok for hem)
-                        // Y moves up with the body top
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y + bodyTopMovement,
@@ -165,30 +167,24 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // Helper to update position based on Left/Right logic
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
                         const lowerName = m.name.toLowerCase()
-                        let posX = m.position.x * scaleX // Default linear scaling
+                        let posX = m.position.x
 
-                        // "Push from Center" Logic for Cords/Stoppers
-                        // If it's a left part, move further left by the expansion amount
-                        // If it's a right part, move further right
-                        if (lowerName.includes('left')) {
-                            // Depending on coordinate system, Left might be +X or -X
-                            // Assuming typical setup: Left is +X, Right is -X (or vice versa)
-                            // We check original sign. If positive, add movement. If negative, subtract.
-                            // However, safer to just ADD movement to positive X and SUBTRACT from negative X?
-                            // No, user specifically labeled "left" vs "right".
-                            // Let's assume standard: Left = +X (or -X).
-                            // If X > 0, add movement. If X < 0, subtract movement.
-                            // Wait, if X is 0 (center), it stays 0.
-                            // Simpler: Just move "outward" from center?
-                            // Actually, let's use the labels as requested.
+                        // Strict Directional Force Logic
+                        // "Left" mesh = Move MORE Left (Negative X)
+                        // "Right" mesh = Move MORE Right (Positive X)
+                        // This preserves distance from the expanding edge.
 
-                            // Let's deduce direction from current position
-                            if (m.position.x > 0) posX = m.position.x + bodyWidthMovement
-                            else posX = m.position.x - bodyWidthMovement
+                        if (lowerName.includes('_left') || lowerName.includes('left')) {
+                            // Assuming Left is Negative X direction
+                            posX = m.position.x - expansionPerSide
                         }
-                        else if (lowerName.includes('right')) {
-                            if (m.position.x > 0) posX = m.position.x + bodyWidthMovement
-                            else posX = m.position.x - bodyWidthMovement
+                        else if (lowerName.includes('_right') || lowerName.includes('right')) {
+                            // Assuming Right is Positive X direction
+                            posX = m.position.x + expansionPerSide
+                        }
+                        else {
+                            // Default to linear scaling for center items
+                            posX = m.position.x * scaleX
                         }
 
                         // Y follows top
@@ -199,6 +195,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                             m.position.z * scaleZ
                         )
                         m.scale.set(1, 1, 1) // Keep original size
+
+                        console.log(`ACCESSORY [${m.name}]:`, {
+                            originalX: m.position.x,
+                            newX: posX,
+                            applied: lowerName.includes('left') ? 'LEFT (-)' : (lowerName.includes('right') ? 'RIGHT (+)' : 'LINEAR')
+                        })
                     }
 
                     // Apply to Stopper
