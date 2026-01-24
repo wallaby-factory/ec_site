@@ -104,9 +104,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // Categorize meshes and determine color
                     if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
                         // Stopper Handling (Base vs Button)
-                        const isBase = lowerName.includes('base')
+                        // User specified: stopper2 is base
+                        const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
 
-                        // Default to the selected color (this covers the Button case)
+                        // Default to the selected color (this covers the Button/stopper1 case)
                         color = stopperColor
 
                         // Override for Base
