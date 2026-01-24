@@ -90,8 +90,19 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // Position moves up as body gets taller
                     else if (lowerName.includes('hem_and_slit')) {
                         color = fabricColor
-                        child.scale.set(scaleX, 1, scaleZ)  // Y stays at 1 (no height change)
-                        child.position.y = child.position.y * scaleY  // Position follows body top
+                        // DEBUG: Log original values
+                        console.log('hem_and_slit BEFORE:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
+
+                        // Multiply original scale (X and Z with body, Y stays original)
+                        child.scale.set(
+                            child.scale.x * scaleX,
+                            child.scale.y,  // Keep original Y scale
+                            child.scale.z * scaleZ
+                        )
+                        // Position follows body top
+                        child.position.y = child.position.y * scaleY
+
+                        console.log('hem_and_slit AFTER:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
                     }
                     // Stopper: Size stays constant, position follows scaling
                     else if (lowerName.includes('stopper')) {
