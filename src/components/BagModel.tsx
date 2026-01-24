@@ -75,6 +75,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     child.castShadow = true
                     child.receiveShadow = true
 
+                    // DEBUG: Log mesh names to console (check browser DevTools)
+                    console.log('FBX Mesh Name:', child.name)
+
                     let color = fabricColor
                     let roughness = 0.6
                     let metalness = 0.0
