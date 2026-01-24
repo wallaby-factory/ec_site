@@ -26,12 +26,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
     const fbx1Cord = useFBX('/models/1code_平型.fbx')
     const fbx2Cord = useFBX('/models/2code_平型.fbx')
 
+    // Constants
     const scale = 0.04
     const hemHeight = 3
     const totalHeight = height * scale
     const floorY = -(totalHeight / 2) - 0.05
 
-    // Position adjustments
+    // Position adjustments for Cylinder
     const mainBodyY = -hemHeight / 2
     const hemY = (height / 2) - (hemHeight / 2)
 
@@ -61,15 +62,26 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         // SQUARE (Flat) / CUBE - Use FBX
         const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
 
-        // Scale Calculation: Base model is 10x10cm body + 4cm hem/slit
+        // Scale Calculation: Base model is 10x10cm
         const scaleX = width / 10
         const scaleY = height / 10
         const scaleZ = shape === 'CUBE' ? depth / 10 : (depth > 0 ? depth / 10 : 1.5)
 
-        // Clone and apply individual scale/position per mesh
+        // Clone and apply materials
         const scene = useMemo(() => {
             const clone = fbx.clone()
 
+            // Map to hold references for second pass
+            const meshes: {
+                body?: THREE.Mesh,
+                hem_and_slot?: THREE.Mesh,
+                stopper?: THREE.Mesh,
+                cords: THREE.Mesh[]
+            } = {
+                cords: []
+            }
+
+            // Phase 1: Traverse to find meshes and apply materials
             clone.traverse((child: any) => {
                 if (child.isMesh) {
                     child.castShadow = true
@@ -81,67 +93,24 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
-                    // DEBUG: Log ALL mesh names
-                    console.log('MESH FOUND:', child.name, 'lower:', lowerName)
-
-                    // body: Scale normally in all directions
-                    if (lowerName.includes('body')) {
-                        color = fabricColor
-                        child.scale.set(scaleX, scaleY, scaleZ)
-                    }
-                    // hem_and_slot: Width/depth scale with body, height stays fixed
-                    // Position moves up as body gets taller
-                    else if (lowerName.includes('hem_and_slot')) {
-                        color = fabricColor
-                        // DEBUG: Log original values
-                        console.log('hem_and_slot BEFORE:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
-
-                        // Multiply original scale (X and Z with body, Y stays original)
-                        child.scale.set(
-                            child.scale.x * scaleX,
-                            child.scale.y,  // Keep original Y scale
-                            child.scale.z * scaleZ
-                        )
-
-                        // Position: Calculate based on body top movement
-                        // Original body is 10cm, so original body top = 5 (half of 10)
-                        // New body top = height / 2
-                        // Hem should move up by how much the body top moved
-                        const originalBodyTop = 5  // Half of original 10cm body
-                        const newBodyTop = height / 2  // Half of new body height
-                        const bodyTopMovement = newBodyTop - originalBodyTop
-                        child.position.y = child.position.y + bodyTopMovement
-
-                        console.log('hem_and_slot AFTER:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y, 'movement=', bodyTopMovement)
-                    }
-                    // Stopper: Size stays constant, position follows scaling
-                    else if (lowerName.includes('stopper')) {
+                    // Categorize meshes
+                    if (lowerName.includes('stopper') || lowerName.includes('fastener')) {
                         color = stopperColor
                         roughness = 0.3
                         metalness = 0.4
-                        // Size stays constant (scale = 1,1,1)
-                        child.scale.set(1, 1, 1)
-                        // Position follows bag dimensions
-                        child.position.set(
-                            child.position.x * scaleX,
-                            child.position.y * scaleY,
-                            child.position.z * scaleZ
-                        )
+                        meshes.stopper = child
                     }
-                    // Cord parts: terminal, middle, turn, knot
-                    else if (lowerName.includes('terminal') ||
-                        lowerName.includes('middle') ||
-                        lowerName.includes('turn') ||
-                        lowerName.includes('knot')) {
+                    else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('terminal') || lowerName.includes('middle') || lowerName.includes('turn') || lowerName.includes('knot')) {
                         color = cordColor
-                        // Size stays constant (scale = 1,1,1)
-                        child.scale.set(1, 1, 1)
-                        // Position follows bag dimensions
-                        child.position.set(
-                            child.position.x * scaleX,
-                            child.position.y * scaleY,
-                            child.position.z * scaleZ
-                        )
+                        meshes.cords.push(child)
+                    }
+                    else if (lowerName.includes('hem_and_slot')) {
+                        color = fabricColor
+                        meshes.hem_and_slot = child
+                    }
+                    else if (lowerName.includes('body')) {
+                        color = fabricColor
+                        meshes.body = child
                     }
 
                     child.material = new THREE.MeshStandardMaterial({
@@ -152,15 +121,76 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     })
                 }
             })
+
+            // Phase 2: Measure Geometry and Apply Transformations
+            if (meshes.body) {
+                // Ensure bounding box is computed to find the top edge of the body
+                if (!meshes.body.geometry.boundingBox) {
+                    meshes.body.geometry.computeBoundingBox()
+                }
+                const bbox = meshes.body.geometry.boundingBox
+
+                if (bbox) {
+                    const originalBodyTop = bbox.max.y
+
+                    // Calculate expected movement of the top edge
+                    // New Top = Original * ScaleY
+                    // Movement = New Top - Original Top
+                    // Since pivots might be at 0, this assumes scaling expands from 0
+                    const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
+
+                    // Apply to Body: Standard Scaling
+                    meshes.body.scale.set(scaleX, scaleY, scaleZ)
+
+                    // Apply to Hem: Fixed Height, Follows Top
+                    if (meshes.hem_and_slot) {
+                        const m = meshes.hem_and_slot
+                        // Keep Scale Fixed (1,1,1)
+                        m.scale.set(1, 1, 1)
+                        // X/Z scales radially (position.x * scaleX)
+                        // Y moves up with the body top
+                        m.position.set(
+                            m.position.x * scaleX,
+                            m.position.y + bodyTopMovement,
+                            m.position.z * scaleZ
+                        )
+                    }
+
+                    // Apply to Stopper: Fixed Size, Follows Top
+                    if (meshes.stopper) {
+                        const m = meshes.stopper
+                        m.scale.set(1, 1, 1)
+                        m.position.set(
+                            m.position.x * scaleX,
+                            m.position.y + bodyTopMovement,
+                            m.position.z * scaleZ
+                        )
+                    }
+
+                    // Apply to Cords: Fixed Size, Follows Top
+                    meshes.cords.forEach(m => {
+                        m.scale.set(1, 1, 1)
+                        m.position.set(
+                            m.position.x * scaleX,
+                            m.position.y + bodyTopMovement,
+                            m.position.z * scaleZ
+                        )
+                    })
+                }
+            } else {
+                // Fallback if 'body' not found (e.g. old model or wrong name)
+                console.warn("Body mesh not found. Scaling logic may be incorrect.")
+            }
+
             return clone
         }, [fbx, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
 
         content = (
             <primitive
                 object={scene}
-                scale={[1, 1, 1]}  // No parent scaling - handled per mesh
+                scale={[1, 1, 1]} // Use Unit Scale for parent, handle scaling per-mesh
                 position={[0, 0, 0]}
-                rotation={[0, -Math.PI / 2, 0]} // Rotate 90 degrees
+                rotation={[0, -Math.PI / 2, 0]}
             />
         )
     }
