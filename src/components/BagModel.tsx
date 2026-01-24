@@ -84,20 +84,20 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     // hem_and_slit: Height stays fixed, position follows scaling
                     if (lowerName.includes('hem_and_slit')) {
                         color = fabricColor
-                        // Inverse Y-scale to keep 4cm height constant
-                        if (scaleY !== 1) {
-                            child.scale.y = 1 / scaleY
-                        }
+                        // Divide Y-scale to counteract parent scaling (preserves original mesh scale)
+                        child.scale.y = child.scale.y / scaleY
                     }
                     // Stopper (only in 1-cord model)
                     else if (lowerName.includes('stopper')) {
                         color = stopperColor
                         roughness = 0.3
                         metalness = 0.4
-                        // Keep size constant, position follows scaling
-                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
-                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
-                        }
+                        // Keep size constant by dividing original scale (position follows scaling)
+                        child.scale.set(
+                            child.scale.x / scaleX,
+                            child.scale.y / scaleY,
+                            child.scale.z / scaleZ
+                        )
                     }
                     // Cord parts: terminal, middle, turn, knot
                     else if (lowerName.includes('terminal') ||
@@ -105,10 +105,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         lowerName.includes('turn') ||
                         lowerName.includes('knot')) {
                         color = cordColor
-                        // Keep size constant, position follows scaling
-                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
-                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
-                        }
+                        // Keep size constant by dividing original scale (position follows scaling)
+                        child.scale.set(
+                            child.scale.x / scaleX,
+                            child.scale.y / scaleY,
+                            child.scale.z / scaleZ
+                        )
                     }
                     // body: Normal scaling (no special treatment)
                     else if (lowerName.includes('body')) {
