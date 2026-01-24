@@ -124,7 +124,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
             // Phase 2: Measure Geometry and Apply Transformations
             if (meshes.body) {
-                // Ensure bounding box is computed to find the top edge of the body
+                // Ensure bounding box is computed
                 if (!meshes.body.geometry.boundingBox) {
                     meshes.body.geometry.computeBoundingBox()
                 }
@@ -133,21 +133,27 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (bbox) {
                     const originalBodyTop = bbox.max.y
 
-                    // Calculate expected movement of the top edge
-                    // New Top = Original * ScaleY
-                    // Movement = New Top - Original Top
-                    // Since pivots might be at 0, this assumes scaling expands from 0
+                    // --- Vertical Movement Logic ---
+                    // Calculate how much the top edge moves up
                     const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
+
+                    // --- Horizontal Movement Logic ---
+                    // Original body width is 10cm, so edge is at +/- 5
+                    // New width is different, so edge moves by (newWidth - 10) / 2
+                    // Since width = scaleX * 10
+                    // Movement = (scaleX * 10 - 10) / 2 = 5 * (scaleX - 1)
+                    const bodyWidthMovement = 5 * (scaleX - 1)
+
 
                     // Apply to Body: Standard Scaling
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
 
-                    // Apply to Hem: Fixed Height, Follows Top
+                    // Apply to Hem: Fixed Height, Follows Top, Scales Width
                     if (meshes.hem_and_slot) {
                         const m = meshes.hem_and_slot
                         // X/Z scales (matches body), Y fixed (1)
                         m.scale.set(scaleX, 1, scaleZ)
-                        // X/Z scales radially (position.x * scaleX)
+                        // X position scales linearly (center pivot assumed ok for hem)
                         // Y moves up with the body top
                         m.position.set(
                             m.position.x * scaleX,
@@ -156,30 +162,57 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         )
                     }
 
-                    // Apply to Stopper: Fixed Size, Follows Top
-                    if (meshes.stopper) {
-                        const m = meshes.stopper
-                        m.scale.set(1, 1, 1)
+                    // Helper to update position based on Left/Right logic
+                    const updateAccessoryPosition = (m: THREE.Mesh) => {
+                        const lowerName = m.name.toLowerCase()
+                        let posX = m.position.x * scaleX // Default linear scaling
+
+                        // "Push from Center" Logic for Cords/Stoppers
+                        // If it's a left part, move further left by the expansion amount
+                        // If it's a right part, move further right
+                        if (lowerName.includes('left')) {
+                            // Depending on coordinate system, Left might be +X or -X
+                            // Assuming typical setup: Left is +X, Right is -X (or vice versa)
+                            // We check original sign. If positive, add movement. If negative, subtract.
+                            // However, safer to just ADD movement to positive X and SUBTRACT from negative X?
+                            // No, user specifically labeled "left" vs "right".
+                            // Let's assume standard: Left = +X (or -X).
+                            // If X > 0, add movement. If X < 0, subtract movement.
+                            // Wait, if X is 0 (center), it stays 0.
+                            // Simpler: Just move "outward" from center?
+                            // Actually, let's use the labels as requested.
+
+                            // Let's deduce direction from current position
+                            if (m.position.x > 0) posX = m.position.x + bodyWidthMovement
+                            else posX = m.position.x - bodyWidthMovement
+                        }
+                        else if (lowerName.includes('right')) {
+                            if (m.position.x > 0) posX = m.position.x + bodyWidthMovement
+                            else posX = m.position.x - bodyWidthMovement
+                        }
+
+                        // Y follows top
+                        // Z scales linearly (depth)
                         m.position.set(
-                            m.position.x * scaleX,
+                            posX,
                             m.position.y + bodyTopMovement,
                             m.position.z * scaleZ
                         )
+                        m.scale.set(1, 1, 1) // Keep original size
                     }
 
-                    // Apply to Cords: Fixed Size, Follows Top
+                    // Apply to Stopper
+                    if (meshes.stopper) {
+                        updateAccessoryPosition(meshes.stopper)
+                    }
+
+                    // Apply to Cords
                     meshes.cords.forEach(m => {
-                        m.scale.set(1, 1, 1)
-                        m.position.set(
-                            m.position.x * scaleX,
-                            m.position.y + bodyTopMovement,
-                            m.position.z * scaleZ
-                        )
+                        updateAccessoryPosition(m)
                     })
                 }
             } else {
-                // Fallback if 'body' not found (e.g. old model or wrong name)
-                console.warn("Body mesh not found. Scaling logic may be incorrect.")
+                console.warn("Body mesh not found!")
             }
 
             return clone
@@ -188,7 +221,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         content = (
             <primitive
                 object={scene}
-                scale={[1, 1, 1]} // Use Unit Scale for parent, handle scaling per-mesh
+                scale={[1, 1, 1]}
                 position={[0, 0, 0]}
                 rotation={[0, -Math.PI / 2, 0]}
             />
