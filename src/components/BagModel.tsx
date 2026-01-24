@@ -54,6 +54,11 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     <mesh position={[radius + 0.5, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
                         <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
                         <meshStandardMaterial color={cordColor} />
+                        {/* Cylinder Outline */}
+                        <mesh scale={[1.02, 1.02, 1.02]}>
+                            <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
+                            <meshBasicMaterial color="black" side={THREE.BackSide} />
+                        </mesh>
                     </mesh>
                 </group>
             </group>
@@ -88,12 +93,16 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     child.receiveShadow = true
 
                     let color = fabricColor
+                    let roughness = 0.6
+                    let metalness = 0.0
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
                     // Categorize meshes
                     if (lowerName.includes('stopper') || lowerName.includes('fastener')) {
                         color = stopperColor
+                        roughness = 0.3
+                        metalness = 0.4
                         meshes.stopper = child
                     }
                     else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('terminal') || lowerName.includes('middle') || lowerName.includes('turn') || lowerName.includes('knot')) {
@@ -109,11 +118,31 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         meshes.body = child
                     }
 
-                    // Use MeshToonMaterial for anime/cartoon look
-                    child.material = new THREE.MeshToonMaterial({
+                    // Revert to MeshStandardMaterial
+                    child.material = new THREE.MeshStandardMaterial({
                         color: color,
+                        roughness: roughness,
+                        metalness: metalness,
                         side: THREE.DoubleSide
                     })
+
+                    // Add Outline (Inverted Hull Method)
+                    // We only add outline if it doesn't already have one (check children)
+                    // Since specific logic applies later, we need to be careful not to duplicate outlines if useMemo runs again
+                    // But traverse runs on a *clone*, so it's fresh every time.
+
+                    const outlineMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x000000,
+                        side: THREE.BackSide
+                    })
+                    const outlineMesh = new THREE.Mesh(child.geometry, outlineMaterial)
+                    outlineMesh.scale.set(1.006, 1.006, 1.006) // Slight scale up for outline
+                    outlineMesh.castShadow = false
+                    outlineMesh.receiveShadow = false
+                    // Ensure the outline is rendered on top of the object if Z-fighting occurs?
+                    // BackSide usually handles it.
+
+                    child.add(outlineMesh)
                 }
             })
 
@@ -242,7 +271,6 @@ export default function BagModelContainer(props: BagModelProps) {
     return (
         <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
-                {/* Adjusted camera Z to 1.8 for closer initial zoom */}
                 <PerspectiveCamera makeDefault position={[0, 0.5, 1.8]} fov={50} />
                 <ambientLight intensity={0.8} />
                 <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
