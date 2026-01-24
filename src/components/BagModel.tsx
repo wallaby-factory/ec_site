@@ -75,45 +75,45 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     child.castShadow = true
                     child.receiveShadow = true
 
-                    // DEBUG: Log mesh names to console (check browser DevTools)
-                    console.log('FBX Mesh Name:', child.name)
-
                     let color = fabricColor
                     let roughness = 0.6
                     let metalness = 0.0
 
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
-                    // Check stopper FIRST (before cord) to avoid "code_stopper" matching "cord"
-                    if (lowerName.includes('stopper') || lowerName.includes('fastener') || lowerName.includes('parts')) {
-                        color = stopperColor
-                        roughness = 0.3
-                        metalness = 0.4
-
-                        // Keep stopper SIZE constant (inverse scale)
-                        // Position will naturally follow bag scaling
-                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
-                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
-                        }
-                    }
-                    // Cord (including knots)
-                    else if (lowerName.includes('cord') || lowerName.includes('rope') || lowerName.includes('himo') || lowerName.includes('curve') || lowerName.includes('line') || lowerName.includes('musubi')) {
-                        color = cordColor
-
-                        // Keep cord SIZE (thickness) constant
-                        // Position will naturally follow bag scaling
-                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
-                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
-                        }
-                    }
-                    // Hem and Slit - keep fixed height (4cm total = 2cm hem + 2cm slit)
-                    else if (lowerName.includes('hem') || lowerName.includes('slit') || lowerName.includes('top')) {
+                    // hem_and_slit: Height stays fixed, position follows scaling
+                    if (lowerName.includes('hem_and_slit')) {
                         color = fabricColor
-
-                        // Keep hem/slit Y-size constant (inverse Y-scale only)
+                        // Inverse Y-scale to keep 4cm height constant
                         if (scaleY !== 1) {
                             child.scale.y = 1 / scaleY
                         }
+                    }
+                    // Stopper (only in 1-cord model)
+                    else if (lowerName.includes('stopper')) {
+                        color = stopperColor
+                        roughness = 0.3
+                        metalness = 0.4
+                        // Keep size constant, position follows scaling
+                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
+                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        }
+                    }
+                    // Cord parts: terminal, middle, turn, knot
+                    else if (lowerName.includes('terminal') ||
+                        lowerName.includes('middle') ||
+                        lowerName.includes('turn') ||
+                        lowerName.includes('knot')) {
+                        color = cordColor
+                        // Keep size constant, position follows scaling
+                        if (scaleX !== 0 && scaleY !== 0 && scaleZ !== 0) {
+                            child.scale.set(1 / scaleX, 1 / scaleY, 1 / scaleZ)
+                        }
+                    }
+                    // body: Normal scaling (no special treatment)
+                    else if (lowerName.includes('body')) {
+                        color = fabricColor
+                        // No scale adjustment - scales normally with bag
                     }
 
                     child.material = new THREE.MeshStandardMaterial({
