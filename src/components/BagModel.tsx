@@ -94,7 +94,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     else if (lowerName.includes('hem_and_slot')) {
                         color = fabricColor
                         // DEBUG: Log original values
-                        console.log('hem_and_slit BEFORE:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
+                        console.log('hem_and_slot BEFORE:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
 
                         // Multiply original scale (X and Z with body, Y stays original)
                         child.scale.set(
@@ -102,10 +102,17 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                             child.scale.y,  // Keep original Y scale
                             child.scale.z * scaleZ
                         )
-                        // Position follows body top
-                        child.position.y = child.position.y * scaleY
 
-                        console.log('hem_and_slit AFTER:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y)
+                        // Position: Calculate based on body top movement
+                        // Original body is 10cm, so original body top = 5 (half of 10)
+                        // New body top = height / 2
+                        // Hem should move up by how much the body top moved
+                        const originalBodyTop = 5  // Half of original 10cm body
+                        const newBodyTop = height / 2  // Half of new body height
+                        const bodyTopMovement = newBodyTop - originalBodyTop
+                        child.position.y = child.position.y + bodyTopMovement
+
+                        console.log('hem_and_slot AFTER:', 'scale=', child.scale.x, child.scale.y, child.scale.z, 'pos.y=', child.position.y, 'movement=', bodyTopMovement)
                     }
                     // Stopper: Size stays constant, position follows scaling
                     else if (lowerName.includes('stopper')) {
