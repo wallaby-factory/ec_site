@@ -43,9 +43,25 @@ const STOCK = {
     FASTENER: ['白'] as string[],
 }
 
-export default function CustomizerPage() {
+interface MaterialData {
+    category: string
+    name: string
+    status: string | null
+}
+
+interface CustomizerProps {
+    materials: MaterialData[]
+}
+
+export default function Customizer({ materials }: CustomizerProps) {
     const router = useRouter()
     const [step, setStep] = useState(1)
+
+    // Stock checking using actual materials from DB
+    const isOutOfStock = (category: string, name: string) => {
+        const material = materials.find(m => m.category === category && m.name === name)
+        return material?.status === 'OUT_OF_STOCK'
+    }
 
     // Current Selection State
     const [shape, setShape] = useState<Shape>('SQUARE')
@@ -73,10 +89,6 @@ export default function CustomizerPage() {
         const p = calculatePrice({ shape, width, height, depth, diameter })
         setPrice(p * quantity)
     }, [shape, width, height, depth, diameter, quantity])
-
-    const isOutOfStock = (category: keyof typeof STOCK, name: string) => {
-        return STOCK[category].includes(name)
-    }
 
     const handleAddToCart = async () => {
         // Build the customization object
