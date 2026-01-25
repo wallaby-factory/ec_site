@@ -107,16 +107,16 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         // User specified: stopper2 is base
                         const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
 
-                        // Helper for Black color check (#CCCCCC)
-                        const isBlack = stopperColor === '#CCCCCC'
+                        // Helper for Black color check (#EEEEEE)
+                        const isBlack = stopperColor === '#EEEEEE'
 
-                        // Default to the selected color, but for Black selection, Button becomes White (#ffffff)
-                        color = isBlack ? '#ffffff' : stopperColor
+                        // Default to the selected color (Button follows selection)
+                        color = stopperColor
 
                         // Override for Base
                         if (isBase) {
-                            // Base is Black only if Black is selected. Otherwise (White or Colors), Base is White (#ffffff).
-                            color = isBlack ? '#CCCCCC' : '#ffffff'
+                            // Base is Black (#EEEEEE) only if Black is selected. Otherwise (White or Colors), Base is White (#ffffff).
+                            color = isBlack ? '#EEEEEE' : '#ffffff'
                         }
 
                         console.log(`[BagModel] Stopper Mesh Found:`, {
