@@ -402,12 +402,13 @@ export default function Customizer({ materials = [] }: { materials?: MaterialSta
                                 <button
                                     key={t.id}
                                     onClick={() => setGroundTexture(t.id as any)}
-                                    className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm transition-all ${t.color} ${groundTexture === t.id ? 'ring-2 ring-offset-2 ring-green-400 scale-105' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`min-w-16 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm transition-all ${t.color} ${groundTexture === t.id ? 'ring-2 ring-offset-2 ring-green-400 scale-105' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     {t.label}
                                 </button>
                             ))}
                         </div>
+
 
                         <section className="card-glass p-8">
                             <h2 className="text-2xl font-bold mb-6 text-green-900">カスタマイズ内容</h2>
