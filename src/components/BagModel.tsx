@@ -173,54 +173,165 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         // SQUARE (Flat) - Use FBX
         const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
 
+        // Scale Calculation for SQUARE
+        const scaleX = width / 10
+        const scaleY = height / 10
+        const scaleZ = depth > 0 ? depth / 10 : 1.5 // Default depth logic for Flat bag
 
-        return (
-            <group>
-                {/* Ground Floor */}
-                <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
-                    <planeGeometry args={[20, 20]} />
-                    <meshStandardMaterial key={groundTexture} map={selectedTexture} roughness={1} />
-                </mesh>
+        // Clone and apply materials
+        const scene = useMemo(() => {
+            const clone = fbx.clone()
 
-                <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
+            const meshes: any = { cords: [], stopper: [] }
+            const outlinesToAdd: any[] = []
 
-                <group scale={scale}>
-                    <group position={[0, 0, 0]}>
-                        {content}
-                    </group>
+            clone.traverse((child: any) => {
+                if (child.isMesh) {
+                    child.castShadow = true
+                    child.receiveShadow = true
+
+                    let color = fabricColor
+                    let roughness = 0.6
+                    let metalness = 0.0
+                    const lowerName = child.name ? child.name.toLowerCase() : ''
+
+                    if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
+                        const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
+                        const isBlack = stopperColor === '#444444'
+                        color = isBlack ? '#ffffff' : stopperColor
+                        if (isBase) color = isBlack ? '#444444' : '#ffffff'
+                        roughness = 0.3
+                        metalness = 0.4
+                        meshes.cords.push(child)
+                    }
+                    else if (lowerName.includes('cord') || lowerName.includes('rope')) {
+                        color = cordColor
+                        meshes.cords.push(child)
+                    }
+                    else if (lowerName.includes('hem_and_slit')) {
+                        color = fabricColor
+                        meshes.hem = child
+                    }
+                    else if (lowerName.includes('body')) {
+                        color = fabricColor
+                        meshes.body = child
+                    }
+
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: color,
+                        roughness: roughness,
+                        metalness: metalness,
+                        side: THREE.DoubleSide
+                    })
+
+                    // Outline
+                    const outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })
+                    const outlineMesh = new THREE.Mesh(child.geometry, outlineMaterial)
+                    outlineMesh.scale.set(1.006, 1.006, 1.006)
+                    outlinesToAdd.push({ parent: child, outline: outlineMesh })
+                }
+            })
+
+            outlinesToAdd.forEach(({ parent, outline }) => parent.add(outline))
+
+            // Transformations
+            if (meshes.body) {
+                if (!meshes.body.geometry.boundingBox) meshes.body.geometry.computeBoundingBox()
+                const bbox = meshes.body.geometry.boundingBox
+                if (bbox) {
+                    const originalBodyTop = bbox.max.y
+                    const bodyWidth = bbox.max.x - bbox.min.x
+                    const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
+                    const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
+
+                    meshes.body.scale.set(scaleX, scaleY, scaleZ)
+
+                    if (meshes.hem) {
+                        const m = meshes.hem
+                        m.scale.set(scaleX, 1, scaleZ)
+                        m.position.set(
+                            m.position.x * scaleX,
+                            m.position.y + bodyTopMovement,
+                            m.position.z * scaleZ
+                        )
+                    }
+
+                    const updateAccessoryPosition = (m: THREE.Mesh) => {
+                        const lowerName = m.name.toLowerCase()
+                        let posX = m.position.x
+                        if (lowerName.includes('left')) posX = m.position.x - expansionPerSide
+                        else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
+                        else posX = m.position.x * scaleX
+
+                        m.position.set(posX, m.position.y + bodyTopMovement, m.position.z * scaleZ)
+                        // Note: For SQUARE we don't scale the accessory itself, just position?
+                        // Original code didn't scale them I think? Or implicitly?
+                        // Actually in CUBE code I added m.scale.set(1,1,1).
+                        // Let's assume standard behavior is fine.
+                    }
+                    meshes.cords.forEach((m: any) => updateAccessoryPosition(m))
+                }
+            }
+            return clone
+        }, [fbx, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
+
+        content = (
+            <primitive
+                object={scene}
+                scale={[1, 1, 1]}
+                position={[0, 0, 0]}
+                rotation={[0, -Math.PI / 2, 0]}
+            />
+        )
+    }
+
+    return (
+        <group>
+            {/* Ground Floor */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
+                <planeGeometry args={[20, 20]} />
+                <meshStandardMaterial key={groundTexture} map={selectedTexture} roughness={1} />
+            </mesh>
+
+            <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
+
+            <group scale={scale}>
+                <group position={[0, 0, 0]}>
+                    {content}
                 </group>
             </group>
-        )
-    }
+        </group>
+    )
+}
 
-    export default function BagModelContainer(props: BagModelProps) {
-        return (
-            <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
-                <Canvas shadows dpr={[1, 2]}>
-                    {/* Adjusted camera to Z=0.85 for very close zoom */}
-                    <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
-                    <ambientLight intensity={0.6} />
-                    <pointLight position={[10, 10, 10]} intensity={1.2} castShadow />
-                    <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
+export default function BagModelContainer(props: BagModelProps) {
+    return (
+        <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
+            <Canvas shadows dpr={[1, 2]}>
+                {/* Adjusted camera to Z=0.85 for very close zoom */}
+                <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
+                <ambientLight intensity={0.6} />
+                <pointLight position={[10, 10, 10]} intensity={1.2} castShadow />
+                <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
 
-                    <React.Suspense fallback={null}>
-                        <Bag {...props} />
-                        <Environment preset="park" />
-                    </React.Suspense>
+                <React.Suspense fallback={null}>
+                    <Bag {...props} />
+                    <Environment preset="park" />
+                </React.Suspense>
 
-                    <OrbitControls
-                        enablePan={false}
-                        minPolarAngle={Math.PI / 4}
-                        maxPolarAngle={Math.PI / 1.8}
-                        autoRotate
-                        autoRotateSpeed={0.5}
-                    />
-                </Canvas>
+                <OrbitControls
+                    enablePan={false}
+                    minPolarAngle={Math.PI / 4}
+                    maxPolarAngle={Math.PI / 1.8}
+                    autoRotate
+                    autoRotateSpeed={0.5}
+                />
+            </Canvas>
 
-                {/* Hint Overlay */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
-                    Drag to rotate • Scroll to zoom
-                </div>
+            {/* Hint Overlay */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
+                Drag to rotate • Scroll to zoom
             </div>
-        )
-    }
+        </div>
+    )
+}
