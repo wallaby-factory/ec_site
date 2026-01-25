@@ -15,12 +15,23 @@ interface BagModelProps {
     cordColor: string
     stopperColor: string
     cordCount?: 1 | 2
+    groundTexture?: 'GRASS' | 'LEAVES' | 'GRAVEL'
 }
 
-function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1 }: BagModelProps) {
-    const grassTexture = useLoader(THREE.TextureLoader, '/assets/textures/shibafu.jpg')
-    grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping
-    grassTexture.repeat.set(4, 4)
+function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1, groundTexture = 'GRASS' }: BagModelProps) {
+    const [grass, leaves, gravel] = useLoader(THREE.TextureLoader, [
+        '/assets/textures/shibafu.jpg',
+        '/assets/textures/fallen_leaves.jpg',
+        '/assets/textures/gravel.jpg'
+    ])
+
+    // Setup Textures
+    const selectedTexture = useMemo(() => {
+        const t = groundTexture === 'LEAVES' ? leaves : (groundTexture === 'GRAVEL' ? gravel : grass)
+        t.wrapS = t.wrapT = THREE.RepeatWrapping
+        t.repeat.set(4, 4)
+        return t
+    }, [groundTexture, grass, leaves, gravel])
 
     // Load FBX models - Updated to new version 4
     const fbx1Cord = useFBX('/models/1code_平型4.fbx')
@@ -276,10 +287,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
     return (
         <group>
-            {/* Grass Floor */}
+            {/* Ground Floor */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
                 <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial map={grassTexture} roughness={1} />
+                <meshStandardMaterial map={selectedTexture} roughness={1} />
             </mesh>
 
             <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
@@ -295,10 +306,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
 export default function BagModelContainer(props: BagModelProps) {
     return (
-        <div
-            className="w-full h-full overflow-hidden shadow-inner border border-slate-200 relative bg-cover bg-center"
-            style={{ backgroundImage: "url('/assets/sky_bg.jpg')" }}
-        >
+        <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
             <Canvas shadows dpr={[1, 2]}>
                 {/* Adjusted camera to Z=0.85 for very close zoom */}
                 <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />

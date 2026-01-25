@@ -57,6 +57,7 @@ export default function Customizer({ materials = [] }: { materials?: MaterialSta
     const [colorFastener, setColorFastener] = useState(COLORS.fastener[0])
     const [cordCount, setCordCount] = useState<1 | 2>(1)
     const [quantity, setQuantity] = useState(1)
+    const [groundTexture, setGroundTexture] = useState<'GRASS' | 'LEAVES' | 'GRAVEL'>('GRASS')
 
     // Helper to check stock status
     const getMaterialStatus = (category: string, name: string) => {
@@ -387,7 +388,25 @@ export default function Customizer({ materials = [] }: { materials?: MaterialSta
                                 cordColor={colorCord.hex}
                                 stopperColor={colorFastener.hex}
                                 cordCount={cordCount}
+                                groundTexture={groundTexture}
                             />
+                        </div>
+
+                        {/* Ground Texture Switcher */}
+                        <div className="flex justify-center gap-2">
+                            {[
+                                { id: 'GRASS', label: '芝生', color: 'bg-green-500' },
+                                { id: 'LEAVES', label: '落ち葉', color: 'bg-orange-700' },
+                                { id: 'GRAVEL', label: '砂利', color: 'bg-gray-500' }
+                            ].map((t) => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setGroundTexture(t.id as any)}
+                                    className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm transition-all ${t.color} ${groundTexture === t.id ? 'ring-2 ring-offset-2 ring-green-400 scale-105' : 'opacity-70 hover:opacity-100'}`}
+                                >
+                                    {t.label}
+                                </button>
+                            ))}
                         </div>
 
                         <section className="card-glass p-8">
