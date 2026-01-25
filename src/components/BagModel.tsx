@@ -20,7 +20,7 @@ interface BagModelProps {
 
 function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1, groundTexture = 'GRASS' }: BagModelProps) {
     const [grass, leaves, gravel] = useLoader(THREE.TextureLoader, [
-        '/assets/textures/shibafu.jpg',
+        '/assets/textures/lawn.jpg',
         '/assets/textures/fallen_leaves.jpg',
         '/assets/textures/gravel.jpg'
     ])
