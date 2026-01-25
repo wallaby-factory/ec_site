@@ -295,7 +295,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
 export default function BagModelContainer(props: BagModelProps) {
     return (
-        <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
+        <div
+            className="w-full h-full overflow-hidden shadow-inner border border-slate-200 relative bg-cover bg-center"
+            style={{ backgroundImage: "url('/assets/sky_bg.jpg')" }}
+        >
             <Canvas shadows dpr={[1, 2]}>
                 {/* Adjusted camera to Z=0.85 for very close zoom */}
                 <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
