@@ -290,7 +290,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
             {/* Ground Floor */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
                 <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial map={selectedTexture} roughness={1} />
+                <meshStandardMaterial key={groundTexture} map={selectedTexture} roughness={1} />
             </mesh>
 
             <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
