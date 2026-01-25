@@ -74,264 +74,153 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 </group>
             </group>
         )
-    } else {
-        // SQUARE (Flat) / CUBE - Use FBX
-        const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
+    } else if (shape === 'CUBE') {
+        const fbx = useFBX('/models/1code_箱型.fbx')
 
-        // Scale Calculation: Base model is 10x10cm
-        const scaleX = width / 10
-        const scaleY = height / 10
-        const scaleZ = shape === 'CUBE' ? depth / 10 : (depth > 0 ? depth / 10 : 1.5)
+        // Base model dimensions (approx 10x10x10)
+        // Hem threshold: defined by Y position where hem starts
+        const HEM_START_Y = 4.0 // Adjust based on model
+        const BASE_HEIGHT = 10
+        const BASE_WIDTH = 10
+        const BASE_DEPTH = 10
 
-        // Clone and apply materials
+        // Target Scales
+        const targetScaleX = width / BASE_WIDTH
+        const targetScaleY = height / BASE_HEIGHT
+        const targetScaleZ = depth / BASE_DEPTH
+
+        // Calculated Shift for Hem (since we don't scale it, we just move it)
+        // New Body Height = (HEM_START_Y + BOTTOM_OFFSET) * targetScaleY
+        // Shift = New Body Top - Old Body Top
+
+        // Simplified Logic:
+        // Vertex Y > HEM_START_Y ? It's Hem.
+        //   New Y = (Y - HEM_START_Y) * 1 + (HEM_START_Y * targetScaleY)
+        // Vertex Y <= HEM_START_Y ? It's Body.
+        //   New Y = Y * targetScaleY
+
         const scene = useMemo(() => {
             const clone = fbx.clone()
 
-            // Map to hold references for second pass
-            const meshes: {
-                body?: THREE.Mesh,
-                hem?: THREE.Mesh,
-                stopper?: { base?: THREE.Mesh, button?: THREE.Mesh }[],
-                cords: THREE.Mesh[]
-            } = {
-                cords: [],
-                stopper: []
-            }
-
-            const outlinesToAdd: { parent: THREE.Object3D, outline: THREE.Mesh }[] = []
-
-            // Phase 1: Traverse to find meshes and apply materials
             clone.traverse((child: any) => {
                 if (child.isMesh) {
                     child.castShadow = true
                     child.receiveShadow = true
 
+                    const lowerName = child.name.toLowerCase()
                     let color = fabricColor
-                    let roughness = 0.6
-                    let metalness = 0.0
 
-                    const lowerName = child.name ? child.name.toLowerCase() : ''
-
-                    // Categorize meshes and determine color
-                    if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
-                        // Stopper Handling (Base vs Button)
-                        // User specified: stopper2 is base
+                    if (lowerName.includes('cord')) color = cordColor
+                    else if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
                         const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
-
-                        // Helper for Black color check (#444444)
                         const isBlack = stopperColor === '#444444'
-
-                        // Default to the selected color, but for Black selection, Button becomes White (#ffffff)
                         color = isBlack ? '#ffffff' : stopperColor
-
-                        // Override for Base
-                        if (isBase) {
-                            // Base is Black (#444444) only if Black is selected. Otherwise (White or Colors), Base is White (#ffffff).
-                            color = isBlack ? '#444444' : '#ffffff'
-                        }
-
-                        console.log(`[BagModel] Stopper Mesh Found:`, {
-                            name: child.name,
-                            lowerName,
-                            isBase,
-                            selectedStopperColor: stopperColor,
-                            assignedColor: color
-                        })
-
-                        roughness = 0.3
-                        metalness = 0.4
-
-                        // Add to cords list for positioning to follow body expansion
-                        meshes.cords.push(child)
-                    }
-                    else if (lowerName.includes('cord') || lowerName.includes('rope')) {
-                        color = cordColor
-                        meshes.cords.push(child)
-                    }
-                    else if (lowerName.includes('hem_and_slit')) {
-                        color = fabricColor
-                        meshes.hem = child
-                    }
-                    else if (lowerName.includes('body')) {
-                        color = fabricColor
-                        meshes.body = child
+                        if (isBase) color = isBlack ? '#444444' : '#ffffff'
                     }
 
-                    // Revert to MeshStandardMaterial
                     child.material = new THREE.MeshStandardMaterial({
                         color: color,
-                        roughness: roughness,
-                        metalness: metalness,
+                        roughness: 0.6,
                         side: THREE.DoubleSide
                     })
 
-                    // Add Outline (Inverted Hull Method)
-                    const outlineMaterial = new THREE.MeshBasicMaterial({
-                        color: 0x000000,
-                        side: THREE.BackSide
-                    })
-                    const outlineMesh = new THREE.Mesh(child.geometry, outlineMaterial)
-                    outlineMesh.scale.set(1.006, 1.006, 1.006)
-                    outlineMesh.castShadow = false
-                    outlineMesh.receiveShadow = false
+                    // --- VERTEX MANIPULATION ---
+                    // Clone geometry to avoid affecting shared resource
+                    const geometry = child.geometry.clone()
+                    const posAttribute = geometry.attributes.position
+                    const vertex = new THREE.Vector3()
 
-                    outlinesToAdd.push({ parent: child, outline: outlineMesh })
-                }
-            })
+                    for (let i = 0; i < posAttribute.count; i++) {
+                        vertex.fromBufferAttribute(posAttribute, i)
 
-            // Add collected outlines
-            outlinesToAdd.forEach(({ parent, outline }) => {
-                parent.add(outline)
-            })
+                        // 1. Scale X and Z (Width / Depth) - Apply to ALL vertices
+                        vertex.x *= targetScaleX
+                        vertex.z *= targetScaleZ
 
-            // Phase 2: Measure Geometry and Apply Transformations
-            if (meshes.body) {
-                // Ensure bounding box is computed
-                if (!meshes.body.geometry.boundingBox) {
-                    meshes.body.geometry.computeBoundingBox()
-                }
-                const bbox = meshes.body.geometry.boundingBox
+                        // 2. Smart Y Scaling (Height)
+                        if (vertex.y > HEM_START_Y) {
+                            // HEM AREA: Preserve original height, move it up
+                            // The bottom of the hem is at HEM_START_Y.
+                            // The new bottom of the hem should be at (HEM_START_Y * targetScaleY)
+                            const offsetFromHemStart = vertex.y - HEM_START_Y
+                            vertex.y = (HEM_START_Y * targetScaleY) + offsetFromHemStart
+                        } else {
+                            // BODY AREA: Scale normally
+                            vertex.y *= targetScaleY
+                        }
 
-                if (bbox) {
-                    const originalBodyTop = bbox.max.y
-
-                    // Measure Body Width
-                    const bodyWidth = bbox.max.x - bbox.min.x
-
-                    console.log('BODY GEOMETRY:', { width: bodyWidth, minX: bbox.min.x, maxX: bbox.max.x })
-
-                    // --- Vertical Movement Logic ---
-                    const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
-
-                    // --- Horizontal Movement Logic (Force Push Outward) ---
-                    const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
-
-                    console.log('EXPANSION:', { total: expansionPerSide * 2, perSide: expansionPerSide })
-
-                    // Apply to Body: Standard Scaling
-                    meshes.body.scale.set(scaleX, scaleY, scaleZ)
-
-                    // Apply to Hem: Fixed Height, Follows Top, Scales Width
-                    if (meshes.hem) {
-                        const m = meshes.hem
-                        // Force Height to always be 1 unit (scaleY = 1 / originalHeight?) 
-                        // Wait, if original model hem is 1cm, and we scaled the Group by 0.04...
-                        // Actually, we are scaling the Mesh. 
-                        // If we want fixed height, we just set scaleY = 1.
-                        // And we move it to follow the body top.
-
-                        m.scale.set(scaleX, 1, scaleZ)
-                        m.position.set(
-                            m.position.x * scaleX,
-                            m.position.y + bodyTopMovement,
-                            m.position.z * scaleZ
-                        )
+                        posAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z)
                     }
 
-                    // Helper to update position based on Left/Right logic
-                    const updateAccessoryPosition = (m: THREE.Mesh) => {
-                        const lowerName = m.name.toLowerCase()
-                        let posX = m.position.x
-
-                        // Strict Directional Force Logic
-                        if (lowerName.includes('_left') || lowerName.includes('left')) {
-                            // Assuming Left is Negative X direction
-                            posX = m.position.x - expansionPerSide
-                        }
-                        else if (lowerName.includes('_right') || lowerName.includes('right')) {
-                            // Assuming Right is Positive X direction
-                            posX = m.position.x + expansionPerSide
-                        }
-                        else {
-                            // Default to linear scaling for center items
-                            posX = m.position.x * scaleX
-                        }
-
-                        // Y follows top
-                        // Z scales linearly (depth)
-                        m.position.set(
-                            posX,
-                            m.position.y + bodyTopMovement,
-                            m.position.z * scaleZ
-                        )
-                        m.scale.set(1, 1, 1) // Keep original size
-
-                        console.log(`ACCESSORY [${m.name}]:`, {
-                            originalX: m.position.x,
-                            newX: posX,
-                            applied: lowerName.includes('left') ? 'LEFT (-)' : (lowerName.includes('right') ? 'RIGHT (+)' : 'LINEAR')
-                        })
-                    }
-
-                    // Apply to Cords & Stoppers
-                    meshes.cords.forEach(m => {
-                        updateAccessoryPosition(m)
-                    })
+                    child.geometry = geometry
+                    geometry.computeVertexNormals() // Recompute lighting
+                    geometry.computeBoundingBox()
                 }
-            } else {
-                console.warn("Body mesh not found!")
-            }
-
+            })
             return clone
-        }, [fbx, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
+        }, [fbx, width, height, depth, fabricColor, cordColor, stopperColor])
 
         content = (
             <primitive
                 object={scene}
-                scale={[1, 1, 1]}
-                position={[0, 0, 0]}
+                scale={[1, 1, 1]} // Vertexes are already scaled
+                position={[0, floorY, 0]} // Adjust floor position
                 rotation={[0, -Math.PI / 2, 0]}
             />
         )
-    }
 
-    return (
-        <group>
-            {/* Ground Floor */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
-                <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial key={groundTexture} map={selectedTexture} roughness={1} />
-            </mesh>
+    } else {
+        // SQUARE (Flat) - Use FBX
+        const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
 
-            <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
 
-            <group scale={scale}>
-                <group position={[0, 0, 0]}>
-                    {content}
+        return (
+            <group>
+                {/* Ground Floor */}
+                <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, floorY, 0]} receiveShadow>
+                    <planeGeometry args={[20, 20]} />
+                    <meshStandardMaterial key={groundTexture} map={selectedTexture} roughness={1} />
+                </mesh>
+
+                <ContactShadows position={[0, floorY + 0.001, 0]} opacity={0.5} scale={10} blur={2.5} far={4} color="#000000" />
+
+                <group scale={scale}>
+                    <group position={[0, 0, 0]}>
+                        {content}
+                    </group>
                 </group>
             </group>
-        </group>
-    )
-}
+        )
+    }
 
-export default function BagModelContainer(props: BagModelProps) {
-    return (
-        <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
-            <Canvas shadows dpr={[1, 2]}>
-                {/* Adjusted camera to Z=0.85 for very close zoom */}
-                <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
-                <ambientLight intensity={0.6} />
-                <pointLight position={[10, 10, 10]} intensity={1.2} castShadow />
-                <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
+    export default function BagModelContainer(props: BagModelProps) {
+        return (
+            <div className="w-full h-full bg-sky-100 overflow-hidden shadow-inner border border-slate-200 relative">
+                <Canvas shadows dpr={[1, 2]}>
+                    {/* Adjusted camera to Z=0.85 for very close zoom */}
+                    <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
+                    <ambientLight intensity={0.6} />
+                    <pointLight position={[10, 10, 10]} intensity={1.2} castShadow />
+                    <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
 
-                <React.Suspense fallback={null}>
-                    <Bag {...props} />
-                    <Environment preset="park" />
-                </React.Suspense>
+                    <React.Suspense fallback={null}>
+                        <Bag {...props} />
+                        <Environment preset="park" />
+                    </React.Suspense>
 
-                <OrbitControls
-                    enablePan={false}
-                    minPolarAngle={Math.PI / 4}
-                    maxPolarAngle={Math.PI / 1.8}
-                    autoRotate
-                    autoRotateSpeed={0.5}
-                />
-            </Canvas>
+                    <OrbitControls
+                        enablePan={false}
+                        minPolarAngle={Math.PI / 4}
+                        maxPolarAngle={Math.PI / 1.8}
+                        autoRotate
+                        autoRotateSpeed={0.5}
+                    />
+                </Canvas>
 
-            {/* Hint Overlay */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
-                Drag to rotate • Scroll to zoom
+                {/* Hint Overlay */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none uppercase tracking-widest backdrop-blur-sm">
+                    Drag to rotate • Scroll to zoom
+                </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
