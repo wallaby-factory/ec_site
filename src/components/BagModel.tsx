@@ -299,9 +299,9 @@ export default function BagModelContainer(props: BagModelProps) {
             <Canvas shadows dpr={[1, 2]}>
                 {/* Adjusted camera to Z=0.85 for very close zoom */}
                 <PerspectiveCamera makeDefault position={[0, 0.2, 0.85]} fov={50} />
-                <ambientLight intensity={0.8} />
-                <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
-                <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+                <ambientLight intensity={0.6} />
+                <pointLight position={[10, 10, 10]} intensity={1.2} castShadow />
+                <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
 
                 <React.Suspense fallback={null}>
                     <Bag {...props} />

@@ -15,7 +15,7 @@ const COLORS = {
         { name: 'オレンジ', label: 'ORANGE', hex: '#FF8C00', img: '/assets/fabrics/mesh_orange.jpeg' },
         { name: 'ピンク', label: 'PINK', hex: '#FF69B4', img: '/assets/fabrics/mesh_pink.jpeg' },
         { name: 'ホワイト', label: 'WHITE', hex: '#ffffff', img: '/assets/fabrics/mesh_white.jpeg' },
-        { name: 'ブラック', label: 'BLACK', hex: '#CCCCCC', img: '/assets/fabrics/mesh_black.jpeg' },
+        { name: 'ブラック', label: 'BLACK', hex: '#EEEEEE', img: '/assets/fabrics/mesh_black.jpeg' },
     ],
     cord: [
         { name: 'グリーン', label: 'GREEN', hex: '#84cc16', img: '/assets/cords/cord_green.jpg' },
@@ -23,7 +23,7 @@ const COLORS = {
         { name: 'オレンジ', label: 'ORANGE', hex: '#FF8C00', img: '/assets/cords/cord_orange.jpg' },
         { name: 'ピンク', label: 'PINK', hex: '#FF69B4', img: '/assets/cords/cord_pink.jpg' },
         { name: 'ホワイト', label: 'WHITE', hex: '#ffffff', img: '/assets/cords/cord_white.jpg' },
-        { name: 'ブラック', label: 'BLACK', hex: '#CCCCCC', img: '/assets/cords/cord_black.jpg' },
+        { name: 'ブラック', label: 'BLACK', hex: '#EEEEEE', img: '/assets/cords/cord_black.jpg' },
     ],
     fastener: [
         { name: 'グリーン', label: 'GREEN', hex: '#84cc16', img: '/assets/stoppers/stopper_green.jpg' },
@@ -31,7 +31,7 @@ const COLORS = {
         { name: 'オレンジ', label: 'ORANGE', hex: '#FF8C00', img: '/assets/stoppers/stopper_orange.jpg' },
         { name: 'ピンク', label: 'PINK', hex: '#FF69B4', img: '/assets/stoppers/stopper_pink.jpg' },
         { name: 'ホワイト', label: 'WHITE', hex: '#ffffff', img: '/assets/stoppers/stopper_white.jpg' },
-        { name: 'ブラック', label: 'BLACK', hex: '#CCCCCC', img: '/assets/stoppers/stopper_blackjpg.jpg' },
+        { name: 'ブラック', label: 'BLACK', hex: '#EEEEEE', img: '/assets/stoppers/stopper_blackjpg.jpg' },
     ]
 }
 
