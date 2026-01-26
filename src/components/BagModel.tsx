@@ -16,6 +16,7 @@ interface BagModelProps {
     stopperColor: string
     cordCount?: 1 | 2
     groundTexture?: 'GRASS' | 'LEAVES' | 'GRAVEL'
+    slitSize?: number
 }
 
 function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabricColor, cordColor, stopperColor, cordCount = 1, groundTexture = 'GRASS' }: BagModelProps) {

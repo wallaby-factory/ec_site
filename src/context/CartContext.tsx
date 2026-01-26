@@ -15,6 +15,8 @@ export type CartItem = {
     cordCount: 1 | 2
     quantity: number
     unitPrice: number
+    type?: string
+    slitSize?: number
 }
 
 type CartContextType = {
