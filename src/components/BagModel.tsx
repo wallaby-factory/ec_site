@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useFBX } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useFBX, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface BagModelProps {
@@ -34,9 +34,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         return t
     }, [groundTexture, grass, leaves, gravel])
 
-    // Load FBX models - Updated to new version 6
-    const fbx1Cord = useFBX('/models/1code_平型6.fbx')
-    const fbx2Cord = useFBX('/models/2code_平型6.fbx')
+    // Load GLB models - Updated to version 7 (GLB format)
+    const glb1Cord = useGLTF('/models/1code_平型7.glb')
+    const glb2Cord = useGLTF('/models/2code_平型7.glb')
 
     // Constants
     const scale = 0.04
@@ -171,8 +171,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         )
 
     } else {
-        // SQUARE (Flat) - Use FBX
-        const fbx = cordCount === 1 ? fbx1Cord : fbx2Cord
+        // SQUARE (Flat) - Use GLB
+        const glb = cordCount === 1 ? glb1Cord : glb2Cord
 
         // Scale Calculation for SQUARE
         const scaleX = width / 10
@@ -181,9 +181,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
         // Clone and apply materials
         const scene = useMemo(() => {
-            const clone = fbx.clone()
+            const clone = glb.scene.clone()
 
-            const meshes: any = { cords: [], stopper: [] }
+            const meshes: any = { cords: [], stopper: [], hem: null, slit: null }
             const outlinesToAdd: any[] = []
 
             clone.traverse((child: any) => {
@@ -209,9 +209,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         color = cordColor
                         meshes.cords.push(child)
                     }
-                    else if (lowerName.includes('hem_and_slit')) {
+                    else if (lowerName.includes('square_hem')) {
                         color = fabricColor
                         meshes.hem = child
+                    }
+                    else if (lowerName.includes('square_slit')) {
+                        color = fabricColor
+                        meshes.slit = child
                     }
                     else if (lowerName.includes('body')) {
                         color = fabricColor
@@ -274,7 +278,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 }
             }
             return clone
-        }, [fbx, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
+        }, [glb, fabricColor, cordColor, stopperColor, scaleX, scaleY, scaleZ])
 
         content = (
             <primitive
