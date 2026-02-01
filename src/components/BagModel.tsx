@@ -253,7 +253,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (bbox) {
                     const originalBodyTop = bbox.max.y
                     const bodyWidth = bbox.max.x - bbox.min.x
-                    const bodyTopMovement = (originalBodyTop * scaleY) - originalBodyTop
+                    // GLB coordinate system: Z is height, so use scaleZ for vertical movement
+                    const bodyTopMovement = (originalBodyTop * scaleZ) - originalBodyTop
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
