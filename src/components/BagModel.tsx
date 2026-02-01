@@ -280,15 +280,20 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
                         const lowerName = m.name.toLowerCase()
+
+                        // Apply scale to cord accessories in GLB coordinate system
+                        m.scale.set(scaleX, 1, scaleZ)
+
                         let posX = m.position.x
                         if (lowerName.includes('left')) posX = m.position.x - expansionPerSide
                         else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
                         else posX = m.position.x * scaleX
 
-                        const newPos = [posX, m.position.y + bodyTopMovement, m.position.z * scaleZ]
+                        // GLB rotated system: Z is height, keep Y as is
+                        const newPos = [posX, m.position.y, m.position.z + bodyTopMovement]
                         m.position.set(newPos[0], newPos[1], newPos[2])
 
-                        console.log('Cord position updated:', m.name, 'New position:', newPos)
+                        console.log('Cord position updated:', m.name, 'New position:', newPos, 'Scale:', [scaleX, 1, scaleZ])
                     }
                     console.log('Total cords to update:', meshes.cords.length)
                     meshes.cords.forEach((m: any) => updateAccessoryPosition(m))
