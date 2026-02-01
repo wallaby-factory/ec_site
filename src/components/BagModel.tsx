@@ -214,6 +214,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     else if (lowerName.includes('cord') || lowerName.includes('rope')) {
                         color = cordColor
                         meshes.cords.push(child)
+                        console.log('✓ Cord mesh added:', child.name, 'Color:', cordColor)
                     }
                     else if (lowerName.includes('square_hem')) {
                         color = fabricColor
@@ -284,12 +285,12 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
                         else posX = m.position.x * scaleX
 
-                        m.position.set(posX, m.position.y + bodyTopMovement, m.position.z * scaleZ)
-                        // Note: For SQUARE we don't scale the accessory itself, just position?
-                        // Original code didn't scale them I think? Or implicitly?
-                        // Actually in CUBE code I added m.scale.set(1,1,1).
-                        // Let's assume standard behavior is fine.
+                        const newPos = [posX, m.position.y + bodyTopMovement, m.position.z * scaleZ]
+                        m.position.set(newPos[0], newPos[1], newPos[2])
+
+                        console.log('Cord position updated:', m.name, 'New position:', newPos)
                     }
+                    console.log('Total cords to update:', meshes.cords.length)
                     meshes.cords.forEach((m: any) => updateAccessoryPosition(m))
                 }
             }
