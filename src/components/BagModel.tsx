@@ -251,12 +251,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (!meshes.body.geometry.boundingBox) meshes.body.geometry.computeBoundingBox()
                 const bbox = meshes.body.geometry.boundingBox
                 if (bbox) {
-                    // GLB coordinate system: Z is height, use bbox.max.z
-                    const originalBodyTop = bbox.max.z
+                    const originalBodyTop = bbox.max.y
                     const bodyWidth = bbox.max.x - bbox.min.x
                     // GLB coordinate system: Z is height, so use scaleZ for vertical movement
                     const bodyTopMovement = (originalBodyTop * scaleZ) - originalBodyTop
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
+
+                    console.log('bodyTopMovement:', bodyTopMovement, 'scaleZ:', scaleZ, 'originalBodyTop:', originalBodyTop)
 
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
 
@@ -269,6 +270,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                             m.position.y,
                             m.position.z + bodyTopMovement
                         )
+                        console.log('Hem position:', m.position.x, m.position.y, m.position.z)
                     }
 
                     if (meshes.slit) {
