@@ -268,9 +268,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z + bodyTopMovement
+                            m.position.z  // TEST: removed bodyTopMovement
                         )
-                        console.log('Hem position:', m.position.x, m.position.y, m.position.z)
+                        console.log('Hem position:', m.position.x, m.position.y, m.position.z, 'bodyTopMovement (not applied):', bodyTopMovement)
                     }
 
                     if (meshes.slit) {
@@ -280,7 +280,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z + bodyTopMovement
+                            m.position.z  // TEST: removed bodyTopMovement
                         )
                     }
 
@@ -296,7 +296,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         else posX = m.position.x * scaleX
 
                         // GLB rotated system: Z is height, keep Y as is
-                        const newPos = [posX, m.position.y, m.position.z + bodyTopMovement]
+                        const newPos = [posX, m.position.y, m.position.z]  // TEST: removed bodyTopMovement
                         m.position.set(newPos[0], newPos[1], newPos[2])
 
                         console.log('Cord position updated:', m.name, 'New position:', newPos, 'Scale:', [scaleX, 1, scaleZ])
