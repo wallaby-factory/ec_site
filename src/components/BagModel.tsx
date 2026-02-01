@@ -257,10 +257,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (bbox) {
                     const originalBodyTop = bbox.max.y
                     const bodyWidth = bbox.max.x - bbox.min.x
-                    // Use Z-axis for height movement calculation (not Y-axis)
-                    // Calculate the vertical shift needed to stay at the top of the body
-                    // Offset = Scaled Height - Original Height
-                    const verticalShift = bbox.max.z * (scaleZ - 1)
+                    // GLB is rotated -90° around Y-axis, so bbox.max.y corresponds to Z-axis (height)
+                    const verticalShift = bbox.max.y * (scaleZ - 1)
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
