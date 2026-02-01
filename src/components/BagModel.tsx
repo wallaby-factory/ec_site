@@ -253,8 +253,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (bbox) {
                     const originalBodyTop = bbox.max.y
                     const bodyWidth = bbox.max.x - bbox.min.x
-                    // GLB coordinate system: Z is height, so use scaleZ for vertical movement
-                    const bodyTopMovement = (originalBodyTop * scaleZ) - originalBodyTop
+                    // Use Z-axis for height movement calculation (not Y-axis)
+                    const bodyTopMovement = (bbox.max.z * scaleZ) - bbox.max.z
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
                     console.log('bodyTopMovement:', bodyTopMovement, 'scaleZ:', scaleZ, 'originalBodyTop:', originalBodyTop)
@@ -268,9 +268,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z  // TEST: removed bodyTopMovement
+                            m.position.z + bodyTopMovement
                         )
-                        console.log('Hem position:', m.position.x, m.position.y, m.position.z, 'bodyTopMovement (not applied):', bodyTopMovement)
                     }
 
                     if (meshes.slit) {
@@ -280,7 +279,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z  // TEST: removed bodyTopMovement
+                            m.position.z + bodyTopMovement
                         )
                     }
 
@@ -295,11 +294,11 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
                         else posX = m.position.x * scaleX
 
-                        // GLB rotated system: Z is height, keep Y as is
-                        const newPos = [posX, m.position.y, m.position.z]  // TEST: removed bodyTopMovement
+                        // Apply Z-axis movement for height changes
+                        const newPos = [posX, m.position.y, m.position.z + bodyTopMovement]
                         m.position.set(newPos[0], newPos[1], newPos[2])
 
-                        console.log('Cord position updated:', m.name, 'New position:', newPos, 'Scale:', [scaleX, 1, scaleZ])
+                        console.log('Cord position updated:', m.name, 'New position:', newPos)
                     }
                     console.log('Total cords to update:', meshes.cords.length)
                     meshes.cords.forEach((m: any) => updateAccessoryPosition(m))
