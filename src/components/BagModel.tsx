@@ -257,6 +257,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     const bodyTopMovement = (bbox.max.z * scaleZ) - bbox.max.z
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
 
+                    console.log('=== DEBUG INFO ===')
+                    console.log('bbox.min.z:', bbox.min.z, 'bbox.max.z:', bbox.max.z)
+                    console.log('bbox.min.y:', bbox.min.y, 'bbox.max.y:', bbox.max.y)
                     console.log('bodyTopMovement:', bodyTopMovement, 'scaleZ:', scaleZ, 'originalBodyTop:', originalBodyTop)
 
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
@@ -265,11 +268,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         const m = meshes.hem
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
+                        console.log('Hem original position.z:', m.position.z)
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
                             m.position.z * scaleZ
                         )
+                        console.log('Hem new position.z:', m.position.z)
                     }
 
                     if (meshes.slit) {
