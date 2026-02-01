@@ -281,8 +281,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
                         const lowerName = m.name.toLowerCase()
 
-                        // Apply scale to cord accessories in GLB coordinate system
-                        m.scale.set(scaleX, 1, scaleZ)
+                        // Keep cord size constant - don't scale
+                        m.scale.set(1, 1, 1)
 
                         let posX = m.position.x
                         if (lowerName.includes('left')) posX = m.position.x - expansionPerSide
