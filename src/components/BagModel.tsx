@@ -265,11 +265,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         const m = meshes.hem
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
-                        // Position at body's top edge after scaling
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            bbox.max.z * scaleZ
+                            m.position.z * scaleZ
                         )
                     }
 
@@ -277,11 +276,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         const m = meshes.slit
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
-                        // Position at body's top edge after scaling
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            bbox.max.z * scaleZ
+                            m.position.z * scaleZ
                         )
                     }
 
