@@ -175,9 +175,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         const glb = cordCount === 1 ? glb1Cord : glb2Cord
 
         // Scale Calculation for SQUARE
+        // Note: GLB coordinate system after rotation has Y=depth, Z=height
         const scaleX = width / 10
-        const scaleY = height / 10
-        const scaleZ = depth > 0 ? depth / 10 : 1.5 // Default depth logic for Flat bag
+        const scaleY = depth > 0 ? depth / 10 : 1.5 // Y axis = depth (thickness) after rotation
+        const scaleZ = height / 10  // Z axis = height (vertical length) after rotation
 
         // Clone and apply materials
         const scene = useMemo(() => {
