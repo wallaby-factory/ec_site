@@ -197,6 +197,11 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     let metalness = 0.0
                     const lowerName = child.name ? child.name.toLowerCase() : ''
 
+                    // Debug: Log mesh names
+                    if (child.name) {
+                        console.log('GLB Mesh found:', child.name, '(lowercase:', lowerName, ')')
+                    }
+
                     if (lowerName.includes('stopper') || lowerName.includes('button') || lowerName.includes('base')) {
                         const isBase = lowerName.includes('base') || lowerName.includes('stopper2')
                         const isBlack = stopperColor === '#444444'
