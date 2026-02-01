@@ -261,21 +261,23 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
 
                     if (meshes.hem) {
                         const m = meshes.hem
-                        m.scale.set(scaleX, 1, scaleZ)
+                        // Keep height constant, only scale width
+                        m.scale.set(scaleX, 1, 1)
                         m.position.set(
                             m.position.x * scaleX,
-                            m.position.y + bodyTopMovement,
-                            m.position.z * scaleZ
+                            m.position.y,
+                            m.position.z + bodyTopMovement
                         )
                     }
 
                     if (meshes.slit) {
                         const m = meshes.slit
-                        m.scale.set(scaleX, 1, scaleZ)
+                        // Keep height constant, only scale width
+                        m.scale.set(scaleX, 1, 1)
                         m.position.set(
                             m.position.x * scaleX,
-                            m.position.y + bodyTopMovement,
-                            m.position.z * scaleZ
+                            m.position.y,
+                            m.position.z + bodyTopMovement
                         )
                     }
 
