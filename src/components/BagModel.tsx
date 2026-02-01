@@ -268,7 +268,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z + bodyTopMovement
+                            m.position.z * scaleZ
                         )
                     }
 
@@ -279,7 +279,7 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z + bodyTopMovement
+                            m.position.z * scaleZ
                         )
                     }
 
