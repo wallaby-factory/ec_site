@@ -209,19 +209,23 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         if (isBase) color = isBlack ? '#444444' : '#ffffff'
                         roughness = 0.3
                         metalness = 0.4
+                        child.userData.originalZ = child.position.z
                         meshes.cords.push(child)
                     }
                     else if (lowerName.includes('cord') || lowerName.includes('rope')) {
                         color = cordColor
+                        child.userData.originalZ = child.position.z
                         meshes.cords.push(child)
                         console.log('✓ Cord mesh added:', child.name, 'Color:', cordColor)
                     }
                     else if (lowerName.includes('square_hem')) {
                         color = fabricColor
+                        child.userData.originalZ = child.position.z
                         meshes.hem = child
                     }
                     else if (lowerName.includes('square_slit')) {
                         color = fabricColor
+                        child.userData.originalZ = child.position.z
                         meshes.slit = child
                     }
                     else if (lowerName.includes('body')) {
@@ -254,13 +258,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                     const originalBodyTop = bbox.max.y
                     const bodyWidth = bbox.max.x - bbox.min.x
                     // Use Z-axis for height movement calculation (not Y-axis)
-                    const bodyTopMovement = (bbox.max.z * scaleZ) - bbox.max.z
+                    // Calculate the vertical shift needed to stay at the top of the body
+                    // Offset = Scaled Height - Original Height
+                    const verticalShift = bbox.max.z * (scaleZ - 1)
                     const expansionPerSide = (bodyWidth * scaleX - bodyWidth) / 2
-
-                    console.log('=== DEBUG INFO ===')
-                    console.log('bbox.min.z:', bbox.min.z, 'bbox.max.z:', bbox.max.z)
-                    console.log('bbox.min.y:', bbox.min.y, 'bbox.max.y:', bbox.max.y)
-                    console.log('bodyTopMovement:', bodyTopMovement, 'scaleZ:', scaleZ, 'originalBodyTop:', originalBodyTop)
 
                     meshes.body.scale.set(scaleX, scaleY, scaleZ)
 
@@ -268,26 +269,26 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         const m = meshes.hem
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
-                        console.log('Hem original position.z:', m.position.z)
+                        // Apply vertical shift based on original position
+                        const originalZ = m.userData.originalZ ?? 0
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z * scaleZ
+                            originalZ + verticalShift
                         )
-                        console.log('Hem new position.z:', m.position.z)
                     }
 
                     if (meshes.slit) {
                         const m = meshes.slit
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
-                        console.log('Slit original position.z:', m.position.z)
+                        // Apply vertical shift based on original position
+                        const originalZ = m.userData.originalZ ?? 0
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
-                            m.position.z * scaleZ
+                            originalZ + verticalShift
                         )
-                        console.log('Slit new position.z:', m.position.z)
                     }
 
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
@@ -301,11 +302,10 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
                         else posX = m.position.x * scaleX
 
-                        // Apply scaleZ to Z position directly
-                        const newPos = [posX, m.position.y, m.position.z * scaleZ]
+                        // Apply vertical shift for height changes
+                        const originalZ = m.userData.originalZ ?? 0
+                        const newPos = [posX, m.position.y, originalZ + verticalShift]
                         m.position.set(newPos[0], newPos[1], newPos[2])
-
-                        console.log('Cord position updated:', m.name, 'New position:', newPos)
                     }
                     console.log('Total cords to update:', meshes.cords.length)
                     meshes.cords.forEach((m: any) => updateAccessoryPosition(m))
