@@ -34,9 +34,9 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
         return t
     }, [groundTexture, grass, leaves, gravel])
 
-    // Load FBX models - Updated to new version 4
-    const fbx1Cord = useFBX('/models/1code_平型4.fbx')
-    const fbx2Cord = useFBX('/models/2code_平型4.fbx')
+    // Load FBX models - Updated to new version 6
+    const fbx1Cord = useFBX('/models/1code_平型6.fbx')
+    const fbx2Cord = useFBX('/models/2code_平型6.fbx')
 
     // Constants
     const scale = 0.04
