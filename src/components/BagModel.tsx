@@ -281,11 +281,13 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         const m = meshes.slit
                         // Keep height constant, only scale width
                         m.scale.set(scaleX, 1, 1)
+                        console.log('Slit original position.z:', m.position.z)
                         m.position.set(
                             m.position.x * scaleX,
                             m.position.y,
                             m.position.z * scaleZ
                         )
+                        console.log('Slit new position.z:', m.position.z)
                     }
 
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
