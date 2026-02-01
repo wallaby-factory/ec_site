@@ -294,8 +294,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         else if (lowerName.includes('right')) posX = m.position.x + expansionPerSide
                         else posX = m.position.x * scaleX
 
-                        // Apply Z-axis movement for height changes
-                        const newPos = [posX, m.position.y, m.position.z + bodyTopMovement]
+                        // Apply scaleZ to Z position directly
+                        const newPos = [posX, m.position.y, m.position.z * scaleZ]
                         m.position.set(newPos[0], newPos[1], newPos[2])
 
                         console.log('Cord position updated:', m.name, 'New position:', newPos)
