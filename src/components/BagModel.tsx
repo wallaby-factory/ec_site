@@ -251,7 +251,8 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                 if (!meshes.body.geometry.boundingBox) meshes.body.geometry.computeBoundingBox()
                 const bbox = meshes.body.geometry.boundingBox
                 if (bbox) {
-                    const originalBodyTop = bbox.max.y
+                    // GLB coordinate system: Z is height, use bbox.max.z
+                    const originalBodyTop = bbox.max.z
                     const bodyWidth = bbox.max.x - bbox.min.x
                     // GLB coordinate system: Z is height, so use scaleZ for vertical movement
                     const bodyTopMovement = (originalBodyTop * scaleZ) - originalBodyTop
