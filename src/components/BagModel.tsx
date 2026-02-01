@@ -261,6 +261,16 @@ function Bag({ width, height, depth = 10, diameter = 15, shape = 'SQUARE', fabri
                         )
                     }
 
+                    if (meshes.slit) {
+                        const m = meshes.slit
+                        m.scale.set(scaleX, 1, scaleZ)
+                        m.position.set(
+                            m.position.x * scaleX,
+                            m.position.y + bodyTopMovement,
+                            m.position.z * scaleZ
+                        )
+                    }
+
                     const updateAccessoryPosition = (m: THREE.Mesh) => {
                         const lowerName = m.name.toLowerCase()
                         let posX = m.position.x
